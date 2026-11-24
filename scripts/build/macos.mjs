@@ -5,8 +5,9 @@
 // - Lite 版通过 `--features free-version` 裁剪 Rust 功能（仅 macOS/Linux）
 // - PKG 走「嵌入 provisioning profile → 重签 app → productbuild」流程
 // - 不再提供独立 sign / notarize 目标（MAS 分发不需要公证）
-import { existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+// - entitlements 里的团队 ID 是占位符，签名前从环境变量替换到 target/
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { ROOT, appVersion, fail, run } from './lib.mjs';
 import { copyToOut } from './out.mjs';
 
@@ -14,6 +15,10 @@ import { copyToOut } from './out.mjs';
 // 正式分发（App Store / 直接下载）时由发布者提供；本地构建默认跳过签名。
 const APP_IDENTITY = process.env.TEXTO_APP_SIGNING_IDENTITY ?? null;
 const INSTALLER_IDENTITY = process.env.TEXTO_INSTALLER_SIGNING_IDENTITY ?? null;
+const APP_TEAM_ID = process.env.TEXTO_APPLE_TEAM_ID ?? null;
+
+/** entitlements 里代表团队 ID 的占位符，构建时替换成真实值。 */
+const TEAM_PLACEHOLDER = 'YOUR_TEAM_ID';
 
 const EDITION_META = {
   full: {
@@ -38,6 +43,36 @@ function archShort(arch) {
   if (arch === 'universal-apple-darwin') return 'universal';
   if (arch.startsWith('aarch64')) return 'aarch64';
   return 'x64';
+}
+
+/** 团队 ID：优先 TEXTO_APPLE_TEAM_ID，其次从签名身份末尾的 "(TEAMID)" 解析。 */
+function resolveTeamId() {
+  const explicit = APP_TEAM_ID?.trim();
+  if (explicit) return explicit;
+  const match = APP_IDENTITY?.match(/\(([A-Z0-9]{10})\)\s*$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * 把 entitlements 里的 YOUR_TEAM_ID 占位符替换成真实团队 ID。
+ * 无团队 ID 时原样返回（占位符保留，调用方应跳过签名而不是签出一个无效的 app）。
+ */
+export function materializeEntitlements({ edition }) {
+  const meta = EDITION_META[edition];
+  if (!meta) fail(`未知 edition: ${edition}`);
+
+  const source = join(ROOT, meta.entitlements);
+  const raw = readFileSync(source, 'utf8');
+  const hasPlaceholder = raw.includes(TEAM_PLACEHOLDER);
+  const teamId = resolveTeamId();
+  if (!hasPlaceholder || !teamId) {
+    return { path: source, relative: null, pendingPlaceholder: hasPlaceholder };
+  }
+
+  const output = join(ROOT, 'src-tauri', 'target', `entitlements.${edition}.plist`);
+  mkdirSync(dirname(output), { recursive: true });
+  writeFileSync(output, raw.split(TEAM_PLACEHOLDER).join(teamId));
+  return { path: output, relative: `target/entitlements.${edition}.plist`, pendingPlaceholder: false };
 }
 
 export function macPaths({ edition, arch, debug }) {
@@ -79,6 +114,14 @@ export function buildMac({ edition, arch = 'universal-apple-darwin', debug = fal
   if (bundles) args.push('--bundles', bundles);
   if (noSign) args.push('--no-sign');
 
+  // 让 Tauri 自身（若由环境变量触发签名）也使用替换后的 entitlements。
+  const entitlements = materializeEntitlements({ edition });
+  if (entitlements.relative) {
+    args.push('--config', JSON.stringify({ bundle: { macOS: { entitlements: entitlements.relative } } }));
+  } else if (entitlements.pendingPlaceholder) {
+    console.warn('⚠️  entitlements 仍是 YOUR_TEAM_ID 占位：设置 TEXTO_APPLE_TEAM_ID，或让签名身份带上 "(TEAMID)"');
+  }
+
   run('bun', args, { env: { TEXTO_DEVTOOLS: devtools ? '1' : undefined } });
 }
 
@@ -105,11 +148,16 @@ function embedProfileAndResign({ edition, arch, debug, noSign }) {
     return app;
   }
 
+  const entitlements = materializeEntitlements({ edition });
+  if (entitlements.pendingPlaceholder) {
+    console.warn('⚠️  entitlements 仍是 YOUR_TEAM_ID 占位：设置 TEXTO_APPLE_TEAM_ID，或让签名身份带上 "(TEAMID)"；本次跳过重签');
+    return app;
+  }
+
   run('cp', [profile, join(app, 'Contents', 'embedded.provisionprofile')]);
-  const entitlements = join(ROOT, meta.entitlements);
   const binary = join(app, 'Contents', 'MacOS', 'texto');
   const frameworksDir = join(app, 'Contents', 'Frameworks');
-  const common = ['--force', '--entitlements', entitlements, '--identifier', meta.identifier, '--options', 'runtime', '--sign', APP_IDENTITY];
+  const common = ['--force', '--entitlements', entitlements.path, '--identifier', meta.identifier, '--options', 'runtime', '--sign', APP_IDENTITY];
 
   console.log('🔏 重新签名 app...');
   codesign([...common, binary]);

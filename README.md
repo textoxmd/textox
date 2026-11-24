@@ -96,14 +96,16 @@ bun run app:package -- --store      # 应用商店：macOS PKG / Windows MSIX
 ```sh
 export TEXTO_APP_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
 export TEXTO_INSTALLER_SIGNING_IDENTITY="Developer ID Installer: Your Name (TEAMID)"
+# 可选：签名身份末尾已带 (TEAMID) 时可省略
+export TEXTO_APPLE_TEAM_ID="TEAMID"
 ```
 
 未设置时构建会跳过签名并给出提示；`--no-sign` 可显式跳过。商店（PKG）构建还需要把
 `embedded.provisionprofile` / `embedded.provisionprofile.lite` 放到 `src-tauri/`（已 gitignore）。
 
-> `src-tauri/entitlements*.plist` 中的 `com.apple.application-identifier` 与
-> `com.apple.developer.team-identifier` 仍是原开发团队的 Team ID。用你自己的团队做
-> App Store 构建前请替换为自己的值；只做本地/直接安装构建时，可删除这两个键。
+`src-tauri/entitlements*.plist` 中用 `YOUR_TEAM_ID` 占位，构建脚本会把真实团队 ID 替换后写入
+`src-tauri/target/entitlements.<edition>.plist` 再交给 `codesign`，因此仓库里不含任何团队 ID。
+只做本地/直接安装构建时无需提供团队 ID。
 
 ### 崩溃上报
 
@@ -136,8 +138,9 @@ SENTRY_DSN="https://<key>@<host>/<project>" bun run app:build
 | `APPLE_PROVISION_PROFILE_LITE` | lite 版 profile 的 base64 |
 | `TEXTO_APP_SIGNING_IDENTITY` | 如 `Apple Distribution: Your Name (TEAMID)` |
 | `TEXTO_INSTALLER_SIGNING_IDENTITY` | 如 `3rd Party Mac Developer Installer: Your Name (TEAMID)` |
+| `TEXTO_APPLE_TEAM_ID` | 可选；团队 ID，缺省从上面两个身份的 `(TEAMID)` 解析 |
 
-同时需按上一节把 `src-tauri/entitlements*.plist` 的 Team ID 换成自己的。
+entitlements 里的团队 ID 在构建时注入，仓库中只有 `YOUR_TEAM_ID` 占位，无需手改。
 Windows 目前没有接入代码签名，MSI/NSIS 会被 SmartScreen 提示。
 
 注意事项：

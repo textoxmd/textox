@@ -61,7 +61,7 @@ npx vitest run --config src/components/TextoEditor/vitest.config.ts tests/featur
 - `scripts/build/` – 统一构建入口（`cli.mjs`：dev/build/package；`macos.mjs`、`windows.mjs`、`frontend.mjs`、`icons.mjs`）
 - `scripts/check/` – 类型检查、骨架/编辑器边界、Vite 缓存、版本号一致性
 - `scripts/i18n/` – 翻译构建
-- 变更提案、规格与历史计划（`openspec/`、`docs/superpowers/`）不随本仓库公开
+- `openspec/` – OpenSpec change management (schema in `openspec/schemas/texto/schema.yaml`)
 
 ## Editor architecture
 
@@ -95,7 +95,7 @@ Editor stack: ProseMirror (core), CodeMirror (source view / code block node view
 - 播种 `plugin_seed_bundled`：同版本幂等；`origin: user` 永不覆盖；卸载 `origin: seed` 留 `uninstalled` 墓碑阻止重播，`plugin_restore_builtin` 清墓碑后重播；升级重播保留 `data.json` 且不自动启用（只有首播按 `defaultEnabled` 启用）。
 - 本地开发三源按 id 合并，后者覆盖：`plugins/*` → `vendor/plugins/*` → `plugin-sources.local.json`（最高，形如 `{"app.textox.mkdext": "../textoxmd/textox-plugin-mkdext"}`，已 gitignore）。`bun run dev` / `bun run app:dev` 经 `scripts/build/plugins.mjs` 汇总到 `src-tauri/resources/plugins/`。
 - 已合并进 mkdext 的 12 个语法插件（alert / auto-pair / emoji / footnote / front-matter / heading-type-indicator / highlight / html / math / sub-sup / toc / underline）存放在 `test-fixtures/plugins/`，**只供编辑器整合测试**通过 `src/components/TextoEditor/tests/plugins-setup.ts` 加载（与 `official-plugins/*` 一起 glob），不进生产包、不参与 `initPlugins()`；它们是 bun workspace 成员，只为安装其第三方依赖。
-- mkdext（`textoxmd/textox-plugin-mkdext`）以子模块 `vendor/plugins/mkdext` 接入，构建读其入库的 `dist/`；在外部 clone 里改完推送、再更新子模块指针，或临时用 `plugin-sources.local.json` 指向外部 clone（优先级最高）。
+- mkdext（`textoxmd/textox-plugin-mkdext`）以子模块 `vendor/plugins/mkdext` 接入，构建读其入库的 `dist/`；在外部 clone（`/Users/geange/workspace/textoxmd/textox-plugin-mkdext`）里改完推送、再更新子模块指针，或临时用 `plugin-sources.local.json` 指向外部 clone（优先级最高）。
 - 资源目录名以插件 `manifest.json` 的 `id` 为准，不是来源目录名（子模块目录叫 `mkdext`、插件 id 是 `app.textox.mkdext`，`scripts/build/plugins.mjs` 已按清单 id 落盘；播种时按目录名当 id 会判定非法而跳过）。
 - 两个 SDK 别混：`@textox/plugin-sdk`（`vendor/plugin-sdk`，0.3.0 起含编辑器契约 `markdown` / `editor` 面）是外部插件唯一契约；`@texto/plugin-sdk`（`packages/plugin-sdk`）是宿主内部聚合（`MARKDOWN_EDITOR_*` / `APP_*` 扩展点常量），作者不依赖，其中编辑器契约与语法引擎已退化为对作者包的转发壳。
 - 启动链 `initPluginRuntime` 会先调 `plugin_seed_bundled` 再扫描；运行时插件的设置字段由 `plugin.config.ts` 的 `settings` 经 `plugin-build` 写入清单，宿主启动时按清单回填默认值。`apply: 'restart'` 的键在 `settings.set()` / 面板写入时只落盘、内存值延后到下次启动生效（跨窗口热更新也忽略磁盘新值），面板标注「重启后生效」。来源标签为「出厂」（资源目录播种）/「本地」（用户导入）。
@@ -163,7 +163,7 @@ Dev: `make dev-lite` / `bun run app:dev -- --edition lite`。
 ## Build & signing (macOS)
 
 - 统一入口：`bun run app:build` / `bun run app:package`（`--edition lite` 切换 Lite）；`make` 只是别名
-- macOS signing: `3rd Party Mac Developer` certs (team `7LAVM7DP77`) — Mac App Store distribution；可用 `TEXTO_APP_SIGNING_IDENTITY` / `TEXTO_INSTALLER_SIGNING_IDENTITY` 覆盖
+- macOS signing: 仓库不含证书与团队 ID；`TEXTO_APP_SIGNING_IDENTITY` / `TEXTO_INSTALLER_SIGNING_IDENTITY` 提供签名身份，团队 ID 由 `TEXTO_APPLE_TEAM_ID` 或身份末尾的 `(TEAMID)` 解析，构建时注入 `src-tauri/target/entitlements.<edition>.plist`（`entitlements*.plist` 里只保留 `YOUR_TEAM_ID` 占位）
 - 打包只分渠道：`app:package`（直接安装：macOS DMG / Windows MSI+NSIS）与 `app:package -- --store`（macOS full+lite PKG / Windows MSIX）
 - PKG 流程（`scripts/build/macos.mjs`）：构建 app → 嵌入 `embedded.provisionprofile[.lite]` → 重签（entitlements）→ `productbuild`，产物写入 `out/`
 - Debug builds via `make build-debug`; `make build-local` — skip signing, enable DevTools (`TEXTO_DEVTOOLS=1`)
@@ -180,6 +180,6 @@ Type: `feat|fix|chore|docs|refactor|style|perf|test`. Scope (optional): e.g., ed
 
 Use `make git-commit` / `make git-push` for structured workflow.
 
-## Specs and change proposals
+## OpenSpec workflow
 
-变更提案与规格文档（OpenSpec 的 `openspec/`、计划与设计稿 `docs/superpowers/`）不随本仓库公开；本仓库只保留代码、构建脚本与面向使用者的文档。
+Changes are managed via OpenSpec in `openspec/`. Schema: `openspec/schemas/texto/schema.yaml` with templates (`proposal.md`, `design.md`, `spec.md`, `tasks.md`). Active changes live in `openspec/changes/`; shipped changes move to `openspec/changes/archive/`. Specs that outlive a single change go in `openspec/specs/`.

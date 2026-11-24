@@ -96,6 +96,8 @@ identities are read from the environment only:
 ```sh
 export TEXTO_APP_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
 export TEXTO_INSTALLER_SIGNING_IDENTITY="Developer ID Installer: Your Name (TEAMID)"
+# Optional: omit when the identity already ends with "(TEAMID)"
+export TEXTO_APPLE_TEAM_ID="TEAMID"
 ```
 
 Without them the build skips signing and prints a warning; pass `--no-sign` to skip
@@ -103,10 +105,10 @@ explicitly. Store (PKG) builds additionally require
 `embedded.provisionprofile` / `embedded.provisionprofile.lite` in `src-tauri/`
 (gitignored).
 
-> `src-tauri/entitlements*.plist` still carries the original team's
-> `com.apple.application-identifier` and `com.apple.developer.team-identifier`.
-> Replace them with your own Team ID before doing App Store builds; for local/direct
-> builds you can drop both keys.
+`src-tauri/entitlements*.plist` keeps `YOUR_TEAM_ID` as a placeholder. The build script
+substitutes the real Team ID into `src-tauri/target/entitlements.<edition>.plist` and
+hands that file to `codesign`, so no Team ID lives in the repository. Local/direct builds
+need no Team ID at all.
 
 ### Crash reporting
 
@@ -140,8 +142,10 @@ Settings → Secrets and variables → Actions:
 | `APPLE_PROVISION_PROFILE_LITE` | base64 of the lite-edition profile |
 | `TEXTO_APP_SIGNING_IDENTITY` | e.g. `Apple Distribution: Your Name (TEAMID)` |
 | `TEXTO_INSTALLER_SIGNING_IDENTITY` | e.g. `3rd Party Mac Developer Installer: Your Name (TEAMID)` |
+| `TEXTO_APPLE_TEAM_ID` | optional; Team ID, otherwise parsed from `(TEAMID)` in the identities above |
 
-You also need to replace the Team ID in `src-tauri/entitlements*.plist` (see above).
+The Team ID is injected into entitlements at build time (the repo only has a `YOUR_TEAM_ID`
+placeholder), so there is nothing to edit by hand.
 Windows code signing is not wired up yet, so MSI/NSIS trigger SmartScreen.
 
 Caveats:
