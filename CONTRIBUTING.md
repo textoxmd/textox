@@ -32,6 +32,15 @@ bun install
 (cd src-tauri && cargo fetch)
 ```
 
+`bun.lock` 里记录的是 `registry.npmjs.org` 的 tarball 地址，不绑定任何镜像。
+如果你在国内需要走镜像，用一次性的参数即可，且**不要把改动后的 `bun.lock` 提交上来**
+（否则其他人的安装会被固定到你的镜像）：
+
+```sh
+bun install --registry https://registry.npmmirror.com
+git checkout bun.lock   # 镜像会改写 lockfile 里的 tarball 地址，提交前还原
+```
+
 ## 开发
 
 ```sh

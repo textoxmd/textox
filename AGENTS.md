@@ -15,7 +15,7 @@ bun run app:dev                # full Tauri desktop dev (make dev)
 >
 > i18n 变更流程（translations）：在 `vendor/translations/sources/*/*.yaml` 内修改 → `cd vendor/translations && bun run build` → 提交 `main` 分支 → 更新 submodule 指针 → 在 textox 根目录运行 `bun run i18n:build` 同步 `src/i18n/locales/*.json`。
 
-**Package manager is Bun.** Do not use npm/pnpm/yarn.
+**Package manager is Bun.** Do not use npm/pnpm/yarn. `bun.lock` 只记录 `registry.npmjs.org` 的 tarball 地址；需要镜像时用 `bun install --registry <mirror>`，并把 `bun.lock` 还原后再提交（CI 有守卫）。
 
 ## Key commands
 
