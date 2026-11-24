@@ -93,7 +93,7 @@ jobs:
       # tag 发布必须公证；手动触发不强制，缺凭据时降级为未公证产物。
       TEXTO_REQUIRE_NOTARIZATION: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -182,7 +182,7 @@ jobs:
     name: Windows
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
