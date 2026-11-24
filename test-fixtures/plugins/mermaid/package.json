@@ -13,7 +13,7 @@
     "@texto/app-api": "workspace:*",
     "@texto/markdown-editor-api": "workspace:*",
     "@texto/plugin-sdk": "workspace:*",
-    "mermaid": "^11.12.3",
+    "mermaid": "^12.3.0",
     "pele": "^1.7.0",
     "prosemirror-model": "^1.25.4",
     "prosemirror-state": "^1.4.4",
