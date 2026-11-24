@@ -523,8 +523,12 @@ export function createPluginApp(
     dialogs: deps.createDialogsApi(manifest.id),
     i18n: {
       // 命名空间由 getFixedT 绑定，插件无法用 vars.ns 越界
-      t: (key: string, vars?: Record<string, unknown>) =>
-        i18n.getFixedT(null, 'plugins')(`${manifest.id}.${key}`, vars),
+      t: (key: string, vars?: Record<string, unknown>) => {
+        const translate = i18n.getFixedT(null, 'plugins');
+        const full = `${manifest.id}.${key}`;
+        // i18next 27 的 t 签名不接受 undefined 作为 options，按需省略第二参
+        return vars ? translate(full, vars) : translate(full);
+      },
       addMessages: (locales: Record<string, Record<string, unknown>>, defaultLocale?: string) =>
         deps.addMessages(locales, defaultLocale, manifest.id),
       // i18next 初始化前 `language` 为空串；插件不该看到空语言码

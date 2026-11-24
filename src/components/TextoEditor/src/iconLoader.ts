@@ -18,7 +18,7 @@ function loadImports(): Promise<IconImports> {
   return importsPromise;
 }
 
-function num(value: string | undefined): number {
+function num(value: string | number | undefined): number {
   return value === undefined ? 0 : Number(value);
 }
 

@@ -14,7 +14,7 @@
     "@texto/markdown-editor-api": "workspace:*",
     "@texto/markdown-editor-runtime": "workspace:*",
     "@texto/plugin-sdk": "workspace:*",
-    "i18next": "^25.8.18",
+    "i18next": "^27.2.3",
     "lucide-react": "1.77.0",
     "prosemirror-model": "^1.25.4",
     "prosemirror-state": "^1.4.4",
