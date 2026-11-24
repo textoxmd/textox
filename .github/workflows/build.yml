@@ -171,7 +171,7 @@ jobs:
             spctl --assess --type open --context context:primary-signature -vv "$dmg"
           done
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Textox-macOS-${{ matrix.edition }}
           path: out/*
@@ -202,7 +202,7 @@ jobs:
       - name: Package
         run: bun run app:package -- --edition full
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Textox-Windows
           path: |
