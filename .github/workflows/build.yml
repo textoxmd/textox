@@ -5,14 +5,24 @@ name: Build
 # - Windows：MSI + NSIS（full）
 # 默认不带任何签名材料，产物未签名，仅供测试；正式分发需配置下方列出的 secrets。
 #
-# 所需 secrets（全部可选，缺省即未签名构建）：
-#   APPLE_CERTIFICATE_P12          Developer ID / Apple Distribution 证书导出为 .p12 后 base64
+# 两条 macOS 渠道用不同的证书，别混用：
+#   direct（DMG，可直接分发）→ "Developer ID Application"，配置公证凭据后自动公证 + staple
+#   store（PKG，上架 App Store）→ "Apple Distribution" + provisioning profile；App Store 不需要公证
+# 推送 v* 标签时 TEXTO_REQUIRE_NOTARIZATION=1：缺凭据会直接失败，避免发出未公证的 release 包。
+#
+# 所需 secrets（全部可选，缺省即未签名/未公证构建）：
+#   APPLE_CERTIFICATE_P12          Developer ID Application 证书导出为 .p12 后 base64
 #   APPLE_CERTIFICATE_PASSWORD     .p12 密码
-#   APPLE_PROVISION_PROFILE        full 版 Mac App Store provisioning profile（base64）
-#   APPLE_PROVISION_PROFILE_LITE   lite 版 Mac App Store provisioning profile（base64）
-#   TEXTO_APP_SIGNING_IDENTITY     如 "Apple Distribution: Your Name (TEAMID)"
-#   TEXTO_INSTALLER_SIGNING_IDENTITY  如 "3rd Party Mac Developer Installer: Your Name (TEAMID)"
+#   APPLE_PROVISION_PROFILE        full 版 Mac App Store provisioning profile（base64，仅 store 渠道）
+#   APPLE_PROVISION_PROFILE_LITE   lite 版 Mac App Store provisioning profile（base64，仅 store 渠道）
+#   TEXTO_APP_SIGNING_IDENTITY     如 "Developer ID Application: Your Name (TEAMID)"
+#   TEXTO_INSTALLER_SIGNING_IDENTITY  如 "3rd Party Mac Developer Installer: Your Name (TEAMID)"（仅 store）
 #   TEXTO_APPLE_TEAM_ID            可选，签名身份末尾已带 (TEAMID) 时可省略
+#   TEXTO_NOTARY_APPLE_ID          Apple ID（公证）
+#   TEXTO_NOTARY_PASSWORD          App 专用密码（公证）
+#   TEXTO_NOTARY_API_KEY           App Store Connect API Key 的 .p8 内容（base64，可选，替代上两项）
+#   TEXTO_NOTARY_API_KEY_ID        对应 Key ID
+#   TEXTO_NOTARY_API_ISSUER        对应 Issuer ID（Team API Key 必填）
 #
 # entitlements 里的团队 ID 由 scripts/build/macos.mjs 在构建时注入
 # （TEXTO_APPLE_TEAM_ID 或签名身份末尾的 "(TEAMID)"），仓库中只保留 YOUR_TEAM_ID 占位。
@@ -75,6 +85,13 @@ jobs:
       TEXTO_APP_SIGNING_IDENTITY: ${{ secrets.TEXTO_APP_SIGNING_IDENTITY }}
       TEXTO_INSTALLER_SIGNING_IDENTITY: ${{ secrets.TEXTO_INSTALLER_SIGNING_IDENTITY }}
       TEXTO_APPLE_TEAM_ID: ${{ secrets.TEXTO_APPLE_TEAM_ID }}
+      TEXTO_NOTARY_APPLE_ID: ${{ secrets.TEXTO_NOTARY_APPLE_ID }}
+      TEXTO_NOTARY_PASSWORD: ${{ secrets.TEXTO_NOTARY_PASSWORD }}
+      TEXTO_NOTARY_API_KEY: ${{ secrets.TEXTO_NOTARY_API_KEY }}
+      TEXTO_NOTARY_API_KEY_ID: ${{ secrets.TEXTO_NOTARY_API_KEY_ID }}
+      TEXTO_NOTARY_API_ISSUER: ${{ secrets.TEXTO_NOTARY_API_ISSUER }}
+      # tag 发布必须公证；手动触发不强制，缺凭据时降级为未公证产物。
+      TEXTO_REQUIRE_NOTARIZATION: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,6 +139,15 @@ jobs:
           fi
           ls -l src-tauri/embedded.provisionprofile* || true
 
+      # TEXTO_NOTARY_API_KEY 里存的是 .p8 的 base64；这里落成文件并把变量改成路径，
+      # 后续步骤（以及 macos.mjs）拿到的就是可用路径。用 Apple ID 方式时不需要这一步。
+      - name: Prepare notarization API key
+        if: env.TEXTO_NOTARY_API_KEY != ''
+        run: |
+          set -euo pipefail
+          printf '%s' "$TEXTO_NOTARY_API_KEY" | openssl base64 -d -A -out "$RUNNER_TEMP/AuthKey.p8"
+          echo "TEXTO_NOTARY_API_KEY=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
+
       - name: Package
         run: |
           set -euo pipefail
@@ -130,6 +156,20 @@ jobs:
             args+=(--store)
           fi
           bun run app:package -- "${args[@]}"
+
+      # 发布包必须公证：再独立校验一次，避免脚本跳过时静默发出未公证的 DMG。
+      - name: Verify notarization
+        if: inputs.store != true && env.TEXTO_REQUIRE_NOTARIZATION == '1'
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          dmgs=(out/*.dmg)
+          [ ${#dmgs[@]} -gt 0 ] || { echo "no DMG in out/"; exit 1; }
+          for dmg in "${dmgs[@]}"; do
+            echo "== $dmg"
+            xcrun stapler validate "$dmg"
+            spctl --assess --type open --context context:primary-signature -vv "$dmg"
+          done
 
       - uses: actions/upload-artifact@v4
         with:

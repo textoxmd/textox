@@ -88,27 +88,53 @@ bun run app:package -- --store      # stores: PKG / MSIX
 Installers (DMG / PKG / MSIX) are copied to `out/`; MSI/NSIS remain under
 `src-tauri/target/release/bundle/`. `make` is a thin alias around `scripts/build/`.
 
-### Code signing
+### Code signing and notarization
 
-The repository contains **no** Apple certificates or provisioning profiles. Signing
-identities are read from the environment only:
+The repository contains **no** Apple certificates, provisioning profiles or notarization
+credentials — everything comes from the environment. The two channels use different certs:
+
+| Channel | Artifact | Certificate | Notarization |
+|---|---|---|---|
+| Direct download (`app:package`) | DMG | `Developer ID Application` | required (automatic) |
+| App Store (`app:package -- --store`) | PKG | `Apple Distribution` + profile | not needed |
+
+Direct download (DMG):
 
 ```sh
 export TEXTO_APP_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
-export TEXTO_INSTALLER_SIGNING_IDENTITY="Developer ID Installer: Your Name (TEAMID)"
-# Optional: omit when the identity already ends with "(TEAMID)"
-export TEXTO_APPLE_TEAM_ID="TEAMID"
+export TEXTO_APPLE_TEAM_ID="TEAMID"             # optional when the identity ends with "(TEAMID)"
+
+# notarization credentials, pick one:
+export TEXTO_NOTARY_KEYCHAIN_PROFILE="notary"   # xcrun notarytool store-credentials notary
+# or Apple ID + app-specific password
+export TEXTO_NOTARY_APPLE_ID="you@example.com"
+export TEXTO_NOTARY_PASSWORD="abcd-efgh-ijkl-mnop"
+# or an App Store Connect API key
+export TEXTO_NOTARY_API_KEY="/path/to/AuthKey_XXXX.p8"
+export TEXTO_NOTARY_API_KEY_ID="XXXX"
+export TEXTO_NOTARY_API_ISSUER="xxxx-xxxx-xxxx"  # required for team keys
+
+bun run app:package
 ```
 
-Without them the build skips signing and prints a warning; pass `--no-sign` to skip
-explicitly. Store (PKG) builds additionally require
-`embedded.provisionprofile` / `embedded.provisionprofile.lite` in `src-tauri/`
-(gitignored).
+The flow: Tauri signs the app with Developer ID + Hardened Runtime
+(`src-tauri/entitlements-direct.plist`, sandbox disabled) → DMG → DMG is signed →
+`notarytool submit --wait` → `stapler staple` → `stapler validate` + `spctl`. On success it
+prints “已公证并装订，可直接分发”.
+
+Without certs/credentials the build warns and skips (local testing only); set
+`TEXTO_REQUIRE_NOTARIZATION=1` to fail instead. `--no-sign` / `--no-notarize` skip explicitly.
+
+> `Apple Distribution` and `3rd Party Mac Developer` certificates **cannot** be notarized.
+> The script detects a non-`Developer ID Application` identity and skips (or fails in
+> required mode).
+
+Store (PKG) builds additionally need `embedded.provisionprofile` /
+`embedded.provisionprofile.lite` in `src-tauri/` (gitignored) and an Apple Distribution cert.
 
 `src-tauri/entitlements*.plist` keeps `YOUR_TEAM_ID` as a placeholder. The build script
 substitutes the real Team ID into `src-tauri/target/entitlements.<edition>.plist` and
-hands that file to `codesign`, so no Team ID lives in the repository. Local/direct builds
-need no Team ID at all.
+hands that file to `codesign`, so no Team ID lives in the repository.
 
 ### Crash reporting
 
@@ -153,7 +179,7 @@ Caveats:
 - macOS runners bill at 10× minutes; on a private repo watch your quota (or build only `full`).
 - Unsigned DMGs are blocked by Gatekeeper elsewhere: right-click open, or
   `xattr -dr com.apple.quarantine Textox.app`.
-- Notarization (`notarytool`) is not implemented yet; add it before public distribution.
+- Without credentials the artifacts are unsigned/unnotarized; configure cert + notary secrets for real releases (tag builds verify it).
 - Parts of `bun.lock` pin Chinese mirrors — installs work on CI but can be slower.
 
 ## Tests and checks

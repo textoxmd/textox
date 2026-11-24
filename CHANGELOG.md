@@ -7,6 +7,7 @@
 - chore(隐私): 不再内置 Sentry DSN，从源码构建的版本不进行崩溃上报（官方构建经 `SENTRY_DSN` 注入）
 - ci: 新增 GitHub Actions（前端类型检查/测试、Rust check/clippy）
 - ci(构建): 新增 `Build` 工作流，手动触发或推送 `v*` 标签时产出 macOS DMG/PKG 与 Windows MSI/NSIS；签名材料只从仓库 secrets 读取，未配置时产出未签名包
+- feat(构建): macOS 直接分发支持 Apple 公证——Developer ID + Hardened Runtime 签名（`entitlements-direct.plist`，不启用沙盒）后自动 `notarytool` 提交、staple 装订与 Gatekeeper 校验；推送 `v*` 标签时强制要求公证成功
 - chore(构建): entitlements 中的团队 ID 改为 `YOUR_TEAM_ID` 占位，构建时由 `TEXTO_APPLE_TEAM_ID` 或签名身份末尾的 `(TEAMID)` 注入 `src-tauri/target/entitlements.<edition>.plist`，仓库不再包含团队 ID
 - fix(插件): 文件类型支持改为由插件决定——白板（`.excalidraw`）等扩展名不再写进默认配置与系统文件关联，导入并启用对应插件后才可打开，禁用/卸载后自动失效
 

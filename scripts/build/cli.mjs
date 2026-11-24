@@ -4,7 +4,7 @@
 // 用法：
 //   node scripts/build/cli.mjs dev     --edition full|lite
 //   node scripts/build/cli.mjs build   --edition full|lite [--debug] [--no-sign]
-//   node scripts/build/cli.mjs package --edition full|lite [--store]
+//   node scripts/build/cli.mjs package --edition full|lite [--store] [--no-notarize]
 import { parseArgs, run, fail, assertEdition } from './lib.mjs';
 import { buildMac, packageMac, storeMac } from './macos.mjs';
 
@@ -14,6 +14,7 @@ const edition = assertEdition(args.edition ?? 'full');
 const platform = normalizePlatform(args.platform ?? process.platform);
 const debug = Boolean(args.debug);
 const noSign = args.sign === false;
+const notarize = args.notarize !== false;
 const arch = args.arch ?? (platform === 'macos' ? 'universal-apple-darwin' : undefined);
 
 function normalizePlatform(value) {
@@ -71,7 +72,7 @@ function tauriBuild() {
 
 function packageApp() {
   if (platform === 'macos') {
-    packageMac({ edition, channel: 'direct', arch, debug, noSign });
+    packageMac({ edition, channel: 'direct', arch, debug, noSign, notarize });
     return;
   }
   if (platform === 'windows') {

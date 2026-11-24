@@ -89,23 +89,50 @@ bun run app:package -- --store      # 应用商店：macOS PKG / Windows MSIX
 
 `make` 只是薄别名（见 `make help`），逻辑全部在 `scripts/build/`。
 
-### 代码签名
+### 代码签名与公证
 
-仓库**不包含**任何 Apple 开发者证书或 provisioning profile。签名信息只从环境变量读取：
+仓库**不包含**任何 Apple 开发者证书、provisioning profile 或公证凭据，全部从环境变量读取。
+两条渠道用的证书不同：
+
+| 渠道 | 产物 | 证书 | 公证 |
+|---|---|---|---|
+| 直接分发（`app:package`） | DMG | `Developer ID Application` | 需要（自动完成） |
+| App Store（`app:package -- --store`） | PKG | `Apple Distribution` + profile | 不需要 |
+
+直接分发（DMG）：
 
 ```sh
 export TEXTO_APP_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
-export TEXTO_INSTALLER_SIGNING_IDENTITY="Developer ID Installer: Your Name (TEAMID)"
-# 可选：签名身份末尾已带 (TEAMID) 时可省略
-export TEXTO_APPLE_TEAM_ID="TEAMID"
+export TEXTO_APPLE_TEAM_ID="TEAMID"             # 可选：身份末尾已带 (TEAMID) 时可省略
+
+# 公证凭据，任选一种：
+export TEXTO_NOTARY_KEYCHAIN_PROFILE="notary"   # xcrun notarytool store-credentials notary
+# 或 Apple ID + App 专用密码
+export TEXTO_NOTARY_APPLE_ID="you@example.com"
+export TEXTO_NOTARY_PASSWORD="abcd-efgh-ijkl-mnop"
+# 或 App Store Connect API Key
+export TEXTO_NOTARY_API_KEY="/path/to/AuthKey_XXXX.p8"
+export TEXTO_NOTARY_API_KEY_ID="XXXX"
+export TEXTO_NOTARY_API_ISSUER="xxxx-xxxx-xxxx"  # Team Key 必填
+
+bun run app:package
 ```
 
-未设置时构建会跳过签名并给出提示；`--no-sign` 可显式跳过。商店（PKG）构建还需要把
-`embedded.provisionprofile` / `embedded.provisionprofile.lite` 放到 `src-tauri/`（已 gitignore）。
+流程：Tauri 用 Developer ID + Hardened Runtime 签 app（`src-tauri/entitlements-direct.plist`，
+不启用沙盒）→ 生成 DMG → 给 DMG 补签名 → `notarytool submit --wait` → `stapler staple` →
+`stapler validate` + `spctl` 校验。成功时输出「已公证并装订，可直接分发」。
+
+没配证书/凭据时只告警并跳过（产物仅供本地测试）；设 `TEXTO_REQUIRE_NOTARIZATION=1`
+可让缺凭据直接失败。`--no-sign` / `--no-notarize` 可显式跳过。
+
+> 注意：`Apple Distribution` 与 `3rd Party Mac Developer` 证书**不能**用于公证，
+> 脚本检测到身份不是 `Developer ID Application` 时会跳过（强制模式下直接报错）。
+
+商店（PKG）构建还需把 `embedded.provisionprofile` / `embedded.provisionprofile.lite`
+放到 `src-tauri/`（已 gitignore），并使用 Apple Distribution 证书。
 
 `src-tauri/entitlements*.plist` 中用 `YOUR_TEAM_ID` 占位，构建脚本会把真实团队 ID 替换后写入
 `src-tauri/target/entitlements.<edition>.plist` 再交给 `codesign`，因此仓库里不含任何团队 ID。
-只做本地/直接安装构建时无需提供团队 ID。
 
 ### 崩溃上报
 
@@ -132,22 +159,28 @@ SENTRY_DSN="https://<key>@<host>/<project>" bun run app:build
 
 | Secret | 用途 |
 |---|---|
-| `APPLE_CERTIFICATE_P12` | 开发者证书 `.p12` 的 base64（`base64 -i cert.p12 \| pbcopy`） |
+| `APPLE_CERTIFICATE_P12` | **Developer ID Application** 证书 `.p12` 的 base64（`base64 -i cert.p12 \| pbcopy`） |
 | `APPLE_CERTIFICATE_PASSWORD` | `.p12` 密码 |
-| `APPLE_PROVISION_PROFILE` | full 版 Mac App Store profile 的 base64 |
-| `APPLE_PROVISION_PROFILE_LITE` | lite 版 profile 的 base64 |
-| `TEXTO_APP_SIGNING_IDENTITY` | 如 `Apple Distribution: Your Name (TEAMID)` |
-| `TEXTO_INSTALLER_SIGNING_IDENTITY` | 如 `3rd Party Mac Developer Installer: Your Name (TEAMID)` |
-| `TEXTO_APPLE_TEAM_ID` | 可选；团队 ID，缺省从上面两个身份的 `(TEAMID)` 解析 |
+| `TEXTO_APP_SIGNING_IDENTITY` | 如 `Developer ID Application: Your Name (TEAMID)` |
+| `TEXTO_APPLE_TEAM_ID` | 可选；团队 ID，缺省从签名身份的 `(TEAMID)` 解析 |
+| `TEXTO_NOTARY_APPLE_ID` | 公证用 Apple ID |
+| `TEXTO_NOTARY_PASSWORD` | 公证用 App 专用密码 |
+| `TEXTO_NOTARY_API_KEY` | 可选；App Store Connect API Key 的 `.p8` 内容（base64），替代上面两项 |
+| `TEXTO_NOTARY_API_KEY_ID` | 对应 Key ID |
+| `TEXTO_NOTARY_API_ISSUER` | 对应 Issuer ID（Team Key 必填） |
+| `APPLE_PROVISION_PROFILE` / `APPLE_PROVISION_PROFILE_LITE` | 仅 `store` 渠道：profile 的 base64 |
+| `TEXTO_INSTALLER_SIGNING_IDENTITY` | 仅 `store` 渠道：`3rd Party Mac Developer Installer: ...` |
 
-entitlements 里的团队 ID 在构建时注入，仓库中只有 `YOUR_TEAM_ID` 占位，无需手改。
-Windows 目前没有接入代码签名，MSI/NSIS 会被 SmartScreen 提示。
+配置了**证书 + 公证凭据**后，DMG 会自动签名、公证并 staple；推送 `v*` 标签时还会强制校验
+（缺凭据直接失败），保证 release 里只有能直接双击打开的包。`store` 渠道仍需换成
+Apple Distribution 证书，且不需要公证。entitlements 里的团队 ID 在构建时注入，仓库中只有
+`YOUR_TEAM_ID` 占位，无需手改。Windows 目前没有接入代码签名，MSI/NSIS 会被 SmartScreen 提示。
 
 注意事项：
 
 - macOS runner 按 10 倍时长计费，私有仓库请留意额度；可在 fork 里只跑 `full`。
 - 未签名 DMG 在别的机器上会被 Gatekeeper 拦，右键打开或 `xattr -dr com.apple.quarantine Textox.app`。
-- 公证书（notarytool）尚未接入，对外正式分发前建议补上。
+- 公证未配置时会降级为未签名/未公证产物；正式发布请配齐证书与公证凭据（tag 构建会强制校验）。
 - `bun.lock` 中部分包记录的是国内镜像地址，CI 上可正常安装但可能偏慢。
 
 ## 测试与检查

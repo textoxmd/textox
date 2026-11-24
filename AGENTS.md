@@ -164,6 +164,7 @@ Dev: `make dev-lite` / `bun run app:dev -- --edition lite`。
 
 - 统一入口：`bun run app:build` / `bun run app:package`（`--edition lite` 切换 Lite）；`make` 只是别名
 - macOS signing: 仓库不含证书与团队 ID；`TEXTO_APP_SIGNING_IDENTITY` / `TEXTO_INSTALLER_SIGNING_IDENTITY` 提供签名身份，团队 ID 由 `TEXTO_APPLE_TEAM_ID` 或身份末尾的 `(TEAMID)` 解析，构建时注入 `src-tauri/target/entitlements.<edition>.plist`（`entitlements*.plist` 里只保留 `YOUR_TEAM_ID` 占位）
+- macOS 公证（直接分发）：`app:package` 用 Developer ID + Hardened Runtime 签 app（`src-tauri/entitlements-direct.plist`，不开沙盒）→ 签 DMG → `notarytool submit --wait` → `stapler staple/validate` → `spctl`；凭据取 `TEXTO_NOTARY_KEYCHAIN_PROFILE` / `TEXTO_NOTARY_APPLE_ID`+`TEXTO_NOTARY_PASSWORD`(+`TEXTO_APPLE_TEAM_ID`) / `TEXTO_NOTARY_API_KEY`+`_API_KEY_ID`+`_API_ISSUER`，缺省跳过，`TEXTO_REQUIRE_NOTARIZATION=1` 时缺凭据直接失败，`--no-notarize` 显式跳过；`Apple Distribution` / `3rd Party Mac Developer` 证书不能公证
 - 打包只分渠道：`app:package`（直接安装：macOS DMG / Windows MSI+NSIS）与 `app:package -- --store`（macOS full+lite PKG / Windows MSIX）
 - PKG 流程（`scripts/build/macos.mjs`）：构建 app → 嵌入 `embedded.provisionprofile[.lite]` → 重签（entitlements）→ `productbuild`，产物写入 `out/`
 - Debug builds via `make build-debug`; `make build-local` — skip signing, enable DevTools (`TEXTO_DEVTOOLS=1`)

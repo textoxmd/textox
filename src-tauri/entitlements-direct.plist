@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      直接分发（Developer ID + 公证）专用 entitlements。
+
+      与 entitlements.plist 的区别：
+      - 不含 com.apple.application-identifier / com.apple.developer.team-identifier：
+        这两个键由 Mac App Store 的 provisioning profile 授予，用在 Developer ID 签名上会导致
+        codesign 失败或公证被拒。
+      - 不开 App Sandbox：直接分发的应用需要按任意路径打开工作区，沙盒会拦掉非用户选择的路径。
+        MCP 的 127.0.0.1 监听也因此不受沙盒网络限制。
+
+      Hardened Runtime（公证的硬性要求）由构建脚本经 tauri 的 bundle.macOS.hardenedRuntime 打开，
+      不需要在这里重复声明。
+    -->
+</dict>
+</plist>
