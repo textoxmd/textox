@@ -1,7 +1,12 @@
 import type { IconDef, IconElement, IconSpec } from "@texto/markdown-editor-api";
 import type { IconNode } from "lucide-react";
 
-type IconModule = { __iconNode: IconNode };
+type IconModule = {
+  /** lucide-react <=1.7x */
+  __iconNode?: IconNode;
+  /** lucide-react 1.77+ 把节点数据挂在 __iconData.node 上 */
+  __iconData?: { node: IconNode };
+};
 type IconImport = () => Promise<IconModule>;
 type IconImports = Record<string, IconImport>;
 
@@ -18,7 +23,7 @@ function loadImports(): Promise<IconImports> {
   return importsPromise;
 }
 
-function num(value: string | undefined): number {
+function num(value: string | number | undefined): number {
   return value === undefined ? 0 : Number(value);
 }
 
@@ -61,7 +66,9 @@ export async function loadIcon(spec: IconSpec): Promise<IconDef> {
   const loader = imports[spec];
   if (!loader) throw new Error(`[iconLoader] unknown lucide icon: ${spec}`);
   const mod = await loader();
-  const def = iconNodeToIconDef(mod.__iconNode);
+  const node = mod.__iconData?.node ?? mod.__iconNode;
+  if (!node) throw new Error(`[iconLoader] icon data missing: ${spec}`);
+  const def = iconNodeToIconDef(node);
   cache.set(spec, def);
   return def;
 }
