@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- docs(README): README 默认英文，中文版独立为 `README.zh-CN.md`；补充官网与 App Store / Microsoft Store 下载入口
 - docs(开源): 项目以 AGPL-3.0-or-later 开源，补充 NOTICE、THIRD_PARTY_NOTICES、CONTRIBUTING、CODE_OF_CONDUCT、SECURITY 与 issue/PR 模板
 - chore(构建): 仓库不再包含 Apple 签名材料与硬编码签名身份，签名身份改由 `TEXTO_APP_SIGNING_IDENTITY` / `TEXTO_INSTALLER_SIGNING_IDENTITY` 提供
 - chore(隐私): 不再内置 Sentry DSN，从源码构建的版本不进行崩溃上报（官方构建经 `SENTRY_DSN` 注入）
