@@ -10,12 +10,12 @@
     }
   },
   "dependencies": {
-    "@animateicons/react": "^0.3.3",
+    "@animateicons/react": "^0.13.0",
     "@texto/markdown-editor-api": "workspace:*",
     "@texto/markdown-editor-runtime": "workspace:*",
     "@texto/plugin-sdk": "workspace:*",
     "i18next": "^25.8.18",
-    "lucide-react": "1.7.0",
+    "lucide-react": "1.77.0",
     "prosemirror-model": "^1.25.4",
     "prosemirror-state": "^1.4.4",
     "prosemirror-view": "^1.41.6",
