@@ -192,7 +192,10 @@ fn stage_and_switch(
             }
             other => format!("read zip entry: {other}"),
         })?;
-        let raw_name = file.name().to_string();
+        let raw_name = file
+            .name()
+            .map_err(|error| format!("read zip entry name: {error}"))?
+            .to_string();
         let relative =
             safe_relative(&raw_name).ok_or_else(|| format!("illegal zip entry: {raw_name}"))?;
         if is_symlink_entry(file.unix_mode()) {
@@ -232,7 +235,7 @@ fn stage_and_switch(
         let remaining = max_total.saturating_sub(total);
         let mut output = std::fs::File::create(&destination)
             .map_err(|error| format!("extract zip entry: {error}"))?;
-        // 声明大小不可信（可伪造），按实际字节截断：最多读到 remaining + 1 就停
+        // 兜底：zip 9 已拒绝声明大小不符的条目，这里仍按实际字节截断，最多读到 remaining + 1 就停
         let written = std::io::copy(&mut file.by_ref().take(remaining + 1), &mut output)
             .map_err(|error| format!("extract zip entry: {error}"))?;
         total = total.saturating_add(written);
@@ -722,7 +725,7 @@ mod tests {
     }
 
     #[test]
-    fn truncates_forged_zips_at_the_limit() {
+    fn rejects_forged_zips_with_mismatched_declared_size() {
         let root = TempRoot::new("textox-install");
         let mut bytes = build_zip(&[
             ("app.textox.demo/manifest.json", MANIFEST),
@@ -732,11 +735,10 @@ mod tests {
 
         let error = install_zip_bytes_limited(root.path(), &bytes, 16, 2000).unwrap_err();
 
-        assert!(error.contains("uncompressed size exceeds limit"), "{error}");
-        // 实际写入必须在「上限 + 1」处停下，而不是先写满再报错
+        // zip 9 起读取端会直接拒绝「声明大小与实际字节不符」的条目；旧版本靠我们按字节截断。
         assert!(
-            error.contains("17 bytes"),
-            "must stop right after the limit: {error}"
+            error.contains("larger than its declared uncompressed size"),
+            "{error}"
         );
         assert!(!root.path().join("app.textox.demo").exists());
         assert!(!has_staging(root.path()));
