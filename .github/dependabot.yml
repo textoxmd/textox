@@ -1,0 +1,42 @@
+version: 2
+
+# Dependabot 默认把有 package.json 的目录都当 npm 项目，遇到 bun.lock 会直接报
+# misconfigured_tooling 失败。这里显式声明 bun 生态（根 workspace 的 lockfile 覆盖
+# packages/*、test-fixtures/plugins/*、plugin-samples/*）。
+updates:
+  - package-ecosystem: 'bun'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      js-minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+
+  - package-ecosystem: 'cargo'
+    directory: '/src-tauri'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      rust-minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+    ignore:
+      # RUSTSEC 提示 glib < 0.20 有漏洞，但 gtk-rs / tauri 生态仍在 0.18，
+      # 目前无可用补丁（桌面端只在 Linux 编译链里出现）。等上游整体升级。
+      - dependency-name: 'glib'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    commit-message:
+      prefix: 'ci(deps)'
