@@ -52,6 +52,18 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # tauri::generate_context! 在编译期读取 src-tauri/icons（构建产物，不入库），
+      # 需要先按 edition 选中一套图标；sharp 由 bun install 提供。
+      - name: Install JS dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Sync app icons
+        run: node scripts/build/icons.mjs select --edition full
+
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
