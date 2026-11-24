@@ -1,0 +1,226 @@
+/* 渲染产物放大浏览（lightbox）+ 渲染容器上的放大按钮。
+   覆盖层挂在 body 上，因此这里的变量一律带 fallback，
+   脱离编辑器主题时也能显示。
+   遮罩不用半透明蒙版，而是与编辑区同色（JS 读编辑区实际背景写入
+   inline style），让"看图"与"编辑"是同一块画布；图与背景之间靠一层
+   细描边 + 柔和投影区分（对应 HIG 的 figure/ground 与分隔线惯例）。 */
+
+.image-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* 背景由 .image-viewer-backdrop 单独承担：整层改 opacity 会连副本一起变
+       透明，看上去像"图闪一下" */
+    background: transparent;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none;
+}
+
+/* 关闭动画期间不再接受指针事件 */
+.image-viewer-overlay.is-closing {
+    pointer-events: none;
+}
+
+/* 背景层：只淡它自己，副本始终不透明 */
+.image-viewer-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--background, #ffffff);
+    pointer-events: none;
+}
+
+.image-viewer-overlay.is-panning {
+    cursor: grabbing;
+}
+
+.image-viewer-stage {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.image-viewer-content {
+    transform-origin: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 拖拽 / 双击都交给 stage 处理 */
+    pointer-events: none;
+    /* 无描边 / 无投影：图的边界只在拖动时由 JS 补一层屏幕 1px 细线 */
+    box-shadow: none;
+}
+
+/* 只在操作过程中提升为合成层（拖动 / 滚轮 / 动画）：操作结束后撤掉提示，
+   浏览器会在最终缩放比例上重新栅格化 —— 常驻 will-change 会让内容停在
+   旧分辨率的缓存上，放大后发虚。 */
+.image-viewer-overlay.is-transforming .image-viewer-content {
+    will-change: transform;
+}
+
+.image-viewer-content>img,
+.image-viewer-content>svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    -webkit-user-drag: none;
+}
+
+.image-viewer-toolbar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+    margin-bottom: 18px;
+    padding: 5px 7px;
+    border-radius: 999px;
+    background: var(--popover, var(--background, #ffffff));
+    border: 1px solid var(--border, #d4d4d8);
+    /* 阴影用黑色基准（与全局浮动工具栏一致）：用 var(--foreground) 调色在暗色
+       主题下会变成白色光晕。暗色下直接去掉阴影，靠描边分层。 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.dark .image-viewer-toolbar {
+    box-shadow: none;
+}
+
+.image-viewer-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--foreground, #18181b);
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.image-viewer-btn:hover {
+    background: color-mix(in srgb, var(--foreground, #18181b) 7%, transparent);
+}
+
+.image-viewer-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
+}
+
+.image-viewer-btn:focus {
+    outline: none;
+}
+
+.image-viewer-btn:focus-visible,
+.image-viewer-zoom-label:focus-visible {
+    outline: 2px solid
+        color-mix(in srgb, var(--ring, var(--foreground, #18181b)) 45%, transparent);
+    outline-offset: 1px;
+}
+
+.image-viewer-zoom-label {
+    min-width: 54px;
+    height: 30px;
+    padding: 0 6px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted-foreground, #52525b);
+    font:
+        12px ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.image-viewer-zoom-label:focus {
+    outline: none;
+}
+
+.image-viewer-zoom-label:hover {
+    background: color-mix(in srgb, var(--foreground, #18181b) 7%, transparent);
+}
+
+/* ─── 渲染容器右上角的放大按钮 ─────────────────────────────────── */
+
+/* 按钮绝对定位需要容器作为定位上下文（code-block.css 未声明 position） */
+.ProseMirror .cb-render-container {
+    position: relative;
+}
+
+.media-zoom-trigger {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--border, #d4d4d8) 75%, transparent);
+    border-radius: 999px;
+    /* 圆形中性色块而不是"白底 + 投影"：悬停控件不需要光晕（暗色主题用 --muted，
+       不会变成浅色小方块）。常驻底色保证在花哨的图上也能看清图标。 */
+    background: var(--muted, var(--popover, #f4f4f5));
+    color: var(--muted-foreground, #52525b);
+    box-shadow: none;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, color 0.15s ease, background-color 0.12s ease;
+}
+
+.media-zoom-trigger:hover {
+    color: var(--foreground, #18181b);
+    background: color-mix(in srgb, var(--foreground, #18181b) 8%, var(--muted, var(--popover, #f4f4f5)));
+}
+
+.image-ref-render:hover>.media-zoom-trigger,
+.cb-render-container:hover>.media-zoom-trigger,
+.media-zoom-trigger:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.media-zoom-trigger:focus-visible {
+    outline: 2px solid
+        color-mix(in srgb, var(--ring, var(--foreground, #18181b)) 45%, transparent);
+    outline-offset: 1px;
+}
+
+/* 行内图片：双击放大，光标给出提示 */
+.ProseMirror img.image-render {
+    cursor: zoom-in;
+}
+
+@media print {
+    .image-viewer-overlay,
+    .media-zoom-trigger {
+        display: none !important;
+    }
+}

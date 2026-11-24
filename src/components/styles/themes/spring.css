@@ -1,0 +1,210 @@
+/**
+ * 惊蛰主题
+ */
+
+:root {
+  --radius: 0.65rem;
+  --background: oklch(0.997 0 0);
+  --foreground: oklch(0.2 0.012 164.7);
+  --card: oklch(0.997 0 0);
+  --card-foreground: oklch(0.2 0.012 164.7);
+  --popover: oklch(0.997 0 0);
+  --popover-foreground: oklch(0.2 0.012 164.7);
+  --primary: oklch(0.636 0.169 137.0);
+  --primary-foreground: oklch(0.997 0 0);
+  --secondary: oklch(0.957 0.015 164.7);
+  --secondary-foreground: oklch(0.2 0.012 164.7);
+  --muted: oklch(0.957 0.015 164.7);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.9 0.04 164.7);
+  --accent-foreground: oklch(0.2 0.012 164.7);
+  --destructive: oklch(0.577 0.245 27.325);
+  --warning: oklch(0.621 0.178 26.1);
+  --border: oklch(0.9 0.015 164.7);
+  --input: oklch(0.9 0.015 164.7);
+  --ring: oklch(0.636 0.169 137.0);
+  --chart-1: oklch(0.636 0.169 137.0);
+  --chart-2: oklch(0.591 0.099 199.3);
+  --chart-3: oklch(0.612 0.192 139.6);
+  --chart-4: oklch(0.496 0.149 145.9);
+  --chart-5: oklch(0.433 0.129 146.1);
+  --sidebar: oklch(0.965 0.01 164.7);
+  --sidebar-foreground: oklch(0.2 0.012 164.7);
+  --sidebar-primary: oklch(0.636 0.169 137.0);
+  --sidebar-primary-foreground: oklch(0.997 0 0);
+  --sidebar-accent: oklch(0.92 0.04 164.7);
+  --sidebar-accent-foreground: oklch(0.2 0.012 164.7);
+  --sidebar-border: oklch(0.9 0.015 164.7);
+  --sidebar-ring: oklch(0.636 0.169 137.0);
+  --breathe-color: oklch(0.636 0.169 137.0);
+  --color-scheme: light;
+  --spring-selection: oklch(0.944 0.025 164.4 / 0.6);
+  --spring-code-bg: oklch(0.944 0.025 164.4 / 0.35);
+  --spring-code-text: oklch(0.496 0.149 145.9);
+  --spring-blockquote-border: oklch(0.636 0.169 137.0);
+  --spring-blockquote-bg: oklch(0.957 0.015 164.7 / 0.5);
+  --spring-link-color: oklch(0.591 0.099 199.3);
+  --spring-link-hover: oklch(0.379 0.094 154.3);
+  --spring-hr-gradient: linear-gradient(90deg, transparent, oklch(0.636 0.169 137.0 / 0.6), transparent);
+  --spring-h1-border: oklch(0.636 0.169 137.0 / 0.3);
+  --spring-h2-border: oklch(0.636 0.169 137.0 / 0.2);
+  --spring-list-marker: oklch(0.496 0.149 145.9);
+  --spring-task-checked: oklch(0.62 0.114 160.7);
+  --md-grid-header-bg: oklch(0.957 0.015 164.7);
+  --md-grid-header-text: oklch(0.433 0.129 146.1);
+}
+
+.dark {
+  --background: oklch(0.25 0.016 220);
+  --foreground: oklch(0.76 0.02 220);
+  --card: oklch(0.28 0.018 220);
+  --card-foreground: oklch(0.76 0.02 220);
+  --popover: oklch(0.28 0.018 220);
+  --popover-foreground: oklch(0.76 0.02 220);
+  --primary: oklch(0.62 0.18 145);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.31 0.02 220);
+  --secondary-foreground: oklch(0.76 0.02 220);
+  --muted: oklch(0.31 0.02 220);
+  --muted-foreground: oklch(0.5 0.022 220);
+  --accent: oklch(0.32 0.03 220);
+  --accent-foreground: oklch(0.76 0.02 220);
+  --destructive: oklch(0.67 0.145 17);
+  --warning: oklch(0.668 0.164 24.7);
+  --border: oklch(0.34 0.02 220);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.62 0.18 145);
+  --chart-1: oklch(0.62 0.18 145);
+  --chart-2: oklch(0.68 0.12 55);
+  --chart-3: oklch(0.52 0.14 160);
+  --chart-4: oklch(0.44 0.12 140);
+  --chart-5: oklch(0.37 0.1 150);
+  --sidebar: oklch(0.22 0.014 220);
+  --sidebar-foreground: oklch(0.76 0.02 220);
+  --sidebar-primary: oklch(0.62 0.18 145);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.26 0.03 180);
+  --sidebar-accent-foreground: oklch(0.76 0.02 220);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.62 0.18 145);
+  --breathe-color: oklch(0.62 0.18 145);
+  --color-scheme: dark;
+  --spring-selection: oklch(0.6 0.18 145 / 0.25);
+  --spring-code-bg: oklch(1 0 0 / 8%);
+  --spring-code-text: oklch(0.7 0.18 145);
+  --spring-blockquote-border: oklch(0.6 0.18 145);
+  --spring-blockquote-bg: oklch(1 0 0 / 4%);
+  --spring-link-color: oklch(0.68 0.12 55);
+  --spring-link-hover: oklch(0.75 0.14 50);
+  --spring-hr-gradient: linear-gradient(90deg, transparent, oklch(0.6 0.18 145 / 0.35), transparent);
+  --spring-h1-border: oklch(0.6 0.18 145 / 0.4);
+  --spring-h2-border: oklch(0.6 0.18 145 / 0.3);
+  --spring-list-marker: oklch(0.7 0.18 145);
+  --spring-task-checked: oklch(0.6 0.18 145);
+  --md-grid-header-bg: oklch(1 0 0 / 8%);
+  --md-grid-header-text: oklch(0.7 0.18 145);
+}
+
+#writer {
+  --source-code-theme-light: githubLight;
+  --source-code-theme-dark: githubDark;
+}
+
+#writer ::selection {
+  background: var(--spring-selection);
+}
+
+#writer h1 {
+  position: relative;
+  text-align: center;
+  padding-bottom: 0.5em;
+}
+
+#writer h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  width: 60%;
+  height: 3px;
+  background: var(--spring-h1-border);
+  border-radius: 2px;
+}
+
+#writer h2 {
+  position: relative;
+  padding-bottom: 0.3em;
+}
+
+#writer h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 4rem;
+  height: 2px;
+  background: var(--spring-h2-border);
+  border-radius: 2px;
+}
+
+#writer a {
+  color: var(--spring-link-color);
+  border-bottom-color: color-mix(in oklch, var(--spring-link-color) 25%, transparent);
+}
+
+#writer a:hover {
+  color: var(--spring-link-hover);
+  border-bottom-color: var(--spring-link-hover);
+}
+
+#writer code {
+  color: var(--spring-code-text);
+  background: var(--spring-code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+#writer pre {
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+
+#writer pre code {
+  background: transparent;
+}
+
+#writer blockquote {
+  border-left: 4px solid var(--spring-blockquote-border);
+  background: var(--spring-blockquote-bg);
+  padding: 0.5em 1em;
+  border-radius: 0 7px 7px 0;
+  margin: 0 0 1em;
+  color: var(--foreground);
+}
+
+#writer blockquote > :first-child {
+  margin-top: 0;
+}
+
+#writer blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+#writer ul .md-list-item::marker {
+  color: var(--spring-list-marker);
+}
+
+#writer ol .md-list-item::marker {
+  color: var(--spring-list-marker);
+  font-weight: 500;
+}
+
+#writer hr {
+  height: 2px;
+  background: var(--spring-hr-gradient);
+  border: 0;
+  margin: 1.6em 0;
+}
+
+

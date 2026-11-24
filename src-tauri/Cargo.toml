@@ -1,0 +1,106 @@
+[package]
+name = "texto"
+version = "2.4.2"
+description = "Best Markdown Editor"
+authors = ["Textox contributors"]
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/chenhualinx/Textox"
+edition = "2021"
+# `src/bin/plugin-cli.rs` makes this package have two binaries; Tauri's dev
+# command runs `cargo run` without `--bin`, so pin the app binary.
+default-run = "texto"
+
+[lib]
+name = "texto_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.2", features = [] }
+
+[dependencies]
+tauri = { version = "2.11", features = ["protocol-asset", "devtools"] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-fs = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "time", "sync"] }
+uuid = { version = "1.0", features = ["v4"] }
+base64 = "0.22"
+tauri-plugin-log = "2"
+tauri-plugin-process = "2"
+tauri-plugin-store = "2"
+tauri-plugin-single-instance = "2"
+log = "0.4"
+chrono = "0.4"
+rand = "0.8"
+# wry 0.55+ 在 macOS 上通过 transparent feature 关闭 WKWebView 默认白色背景
+# （drawsBackground=false + underPageBackgroundColor），配合 background_color 防止暗色模式白闪。
+# 该 feature 与 tauri-runtime-wry 的依赖合并到同一个 wry，不影响窗口透明行为。
+wry = { version = "0.55", features = ["transparent"] }
+scopeguard = "1.2"
+ctrlc = "3.4"
+md5 = "0.7"
+once_cell = "1"
+urlencoding = "2.1"
+notify = "6.1"
+sha2 = "0.10"
+rust-i18n = "3"
+sys-locale = "0.3"
+dirs = "5"
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "system-proxy"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+sentry = "0.49.2"
+
+[target.'cfg(not(target_os = "ios"))'.dependencies]
+trash = "5.2"
+
+[target.'cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))'.dependencies]
+dark-light = "2"
+
+[features]
+# `plugin-cli` 默认开启，保证 `cargo test` / `cargo run --bin plugin-cli` 开箱可用。
+# 打包不受影响：Tauri 只看显式传入的 features（`options.features`，例如
+# `free-version`、`tauri/custom-protocol`），不含 default features，
+# 因此 `required-features` 的检查会跳过它，不会把它当 sidecar 塞进 .app。
+default = ["plugin-cli"]
+free-version = []
+# 只用于 `src/bin/plugin-cli.rs`。Tauri 打包时会把 `src/bin/*` 下的所有二进制
+# 当作 sidecar 塞进 .app，而 universal 构建只为 app 二进制做 lipo，插件 CLI
+# 会因此报 `Failed to copy binary from .../plugin-cli`。用 required-features 让它
+# 默认不参与打包（`bun run plugin:cli` 仍会显式传 `--features plugin-cli`）。
+plugin-cli = []
+
+[[bin]]
+name = "plugin-cli"
+path = "src/bin/plugin-cli.rs"
+required-features = ["plugin-cli"]
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = "0.3"
+objc2-foundation = "0.3"
+libc = "0.2"
+objc2-web-kit = "0.3"
+objc2-store-kit = "0.3"
+block2 = "0.6"
+
+[target.'cfg(target_os = "ios")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = "0.3"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.58", features = [
+    "Win32_Graphics_DirectWrite",
+    "Win32_Foundation",
+] }
+
+
+[profile.dev]
+incremental = true # 以较小的步骤编译您的二进制文件。
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+strip = true

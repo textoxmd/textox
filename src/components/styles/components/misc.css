@@ -1,0 +1,116 @@
+/**
+ * 其他小组件样式
+ * 包含 ThemeSwitcher
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     基础颜色
+     ------------------------------------------ */
+  --misc-text-primary: var(--foreground);
+  --misc-text-secondary: var(--muted-foreground);
+  --misc-bg-primary: var(--background);
+  --misc-bg-quaternary: var(--muted);
+
+  /* ------------------------------------------
+     ThemeSwitcher 组件
+     ------------------------------------------ */
+  --misc-theme-btn-size: var(--btn-icon-size);
+  --misc-theme-btn-padding: var(--btn-icon-padding);
+  --misc-theme-btn-radius: var(--btn-icon-radius);
+  --misc-theme-transition-duration: var(--transition-fast);
+}
+
+/* ============================================
+   信息横幅
+   ============================================ */
+
+.alert-banner {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.alert-banner.info {
+  background: color-mix(in oklch, var(--primary) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
+  color: var(--primary);
+}
+
+.alert-banner.warning {
+  background: color-mix(in oklch, var(--warning) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--warning) 25%, transparent);
+  color: var(--warning);
+}
+
+/* ============================================
+   ThemeSwitcher 组件样式
+   ============================================ */
+
+.theme-switcher-button {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  width: var(--misc-theme-btn-size);
+  height: var(--misc-theme-btn-size);
+  padding: var(--misc-theme-btn-padding);
+  border: none;
+
+  /* 视觉 */
+  background: transparent;
+  border-radius: var(--misc-theme-btn-radius);
+
+  /* 排版 */
+  color: var(--misc-text-secondary);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all var(--misc-theme-transition-duration);
+}
+
+.theme-switcher-button:hover {
+  /* 视觉 */
+  background-color: var(--misc-bg-quaternary);
+
+  /* 排版 */
+  color: var(--misc-text-primary);
+}
+
+/* ============================================
+   WordCountBadge
+   ============================================ */
+
+.word-count-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  background: color-mix(in oklch, var(--background) 60%, transparent);
+  font-size: 11px;
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.word-count-badge.hidden {
+  opacity: 0;
+  transition: opacity 800ms ease-in-out;
+}
+
+.word-count-badge.visible {
+  opacity: 1;
+  transition: opacity 800ms ease-in-out;
+}

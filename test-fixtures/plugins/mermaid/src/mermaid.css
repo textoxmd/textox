@@ -1,0 +1,36 @@
+/*
+ * Pele 图表主题：把 --pele-* 变量映射到应用主题 token。
+ * token 本身随 .dark 切换，因此不需要额外的暗色覆盖。
+ *
+ * 挂在 :root 而非 .mermaid-preview：放大浮层、图片查看器的克隆 DOM 会脱离
+ * 原挂载点，只有继承自根部的变量才能继续生效。
+ */
+:root {
+  --pele-bg: var(--background);
+  --pele-fg: var(--foreground);
+  --pele-muted: var(--muted-foreground);
+  --pele-line: var(--foreground);
+  --pele-surface: var(--muted);
+  --pele-surface-alt: var(--secondary);
+  --pele-border: var(--border);
+  --pele-accent: var(--primary);
+  --pele-critical: var(--destructive);
+  --pele-error: var(--destructive);
+  --pele-radius: 6px;
+  /*
+   * 必须跟随编辑器正文字体：Pele 按传入的 fontFamily 测宽，
+   * 但 SVG 里写的是 font-family:var(--pele-font, <传入字体>)，CSS 变量优先。
+   * 此处不得指回 UI 字体（--font-sans），否则「按编辑器字体测宽、按 UI 字体显示」。
+   */
+  --pele-font: var(--editor-font-family-base, sans-serif);
+  --pele-font-mono: var(--font-mono, ui-monospace, monospace);
+
+  --pele-series-1: var(--chart-1);
+  --pele-series-2: var(--chart-2);
+  --pele-series-3: var(--chart-3);
+  --pele-series-4: var(--chart-4);
+  --pele-series-5: var(--chart-5);
+  --pele-series-6: var(--chart-1);
+  --pele-series-7: var(--chart-2);
+  --pele-series-8: var(--chart-3);
+}

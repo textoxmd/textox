@@ -1,0 +1,1609 @@
+[
+  {
+    "text": "==x==",
+    "spans": [
+      {
+        "type": "highlight",
+        "from": 2,
+        "to": 3,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a ==b== c",
+    "spans": [
+      {
+        "type": "highlight",
+        "from": 4,
+        "to": 5,
+        "openFrom": 2,
+        "openTo": 4,
+        "closeFrom": 5,
+        "closeTo": 7
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "== x ==",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "=====",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "==a==b==",
+    "spans": [
+      {
+        "type": "highlight",
+        "from": 2,
+        "to": 3,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "**==x==**",
+    "spans": [
+      {
+        "type": "highlight",
+        "from": 4,
+        "to": 5,
+        "openFrom": 2,
+        "openTo": 4,
+        "closeFrom": 5,
+        "closeTo": 7
+      },
+      {
+        "type": "strong",
+        "from": 2,
+        "to": 7,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 7,
+        "closeTo": 9
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "==*a*==",
+    "spans": [
+      {
+        "type": "em",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 5
+      },
+      {
+        "type": "highlight",
+        "from": 2,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 5,
+        "closeTo": 7
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "==`c`==",
+    "spans": [
+      {
+        "type": "code",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 5
+      },
+      {
+        "type": "highlight",
+        "from": 2,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 5,
+        "closeTo": 7
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "$x$",
+    "spans": [
+      {
+        "type": "inline_math",
+        "from": 1,
+        "to": 2,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 2,
+        "closeTo": 3,
+        "attrs": {
+          "latex": "x"
+        },
+        "opaque": true,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "softInside": true
+          },
+          {
+            "from": 2,
+            "to": 3
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "outside",
+            "kind": "math-render",
+            "attrs": {
+              "latex": "x"
+            },
+            "side": -1
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a $x^2$ b",
+    "spans": [
+      {
+        "type": "inline_math",
+        "from": 3,
+        "to": 6,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 6,
+        "closeTo": 7,
+        "attrs": {
+          "latex": "x^2"
+        },
+        "opaque": true,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 6,
+            "softInside": true
+          },
+          {
+            "from": 6,
+            "to": 7
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 3,
+            "when": "outside",
+            "kind": "math-render",
+            "attrs": {
+              "latex": "x^2"
+            },
+            "side": -1
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "$ x $",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "$x",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "x$",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "$$x$$",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "\\(y\\)",
+    "spans": [
+      {
+        "type": "inline_math",
+        "from": 2,
+        "to": 3,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 5,
+        "attrs": {
+          "latex": "y"
+        },
+        "opaque": true,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 2,
+            "className": "math-delim-open"
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "softInside": true
+          },
+          {
+            "from": 3,
+            "to": 5,
+            "className": "math-delim-close"
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 2,
+            "when": "outside",
+            "kind": "math-render",
+            "attrs": {
+              "latex": "y"
+            },
+            "side": -1
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a \\( y \\) b",
+    "spans": [
+      {
+        "type": "inline_math",
+        "from": 5,
+        "to": 6,
+        "openFrom": 2,
+        "openTo": 4,
+        "closeFrom": 7,
+        "closeTo": 9,
+        "attrs": {
+          "latex": "y"
+        },
+        "opaque": true,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 4,
+            "className": "math-delim-open"
+          },
+          {
+            "from": 5,
+            "to": 6,
+            "softInside": true
+          },
+          {
+            "from": 7,
+            "to": 9,
+            "className": "math-delim-close"
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 5,
+            "when": "outside",
+            "kind": "math-render",
+            "attrs": {
+              "latex": "y"
+            },
+            "side": -1
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "$~x~$",
+    "spans": [
+      {
+        "type": "inline_math",
+        "from": 1,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 4,
+        "closeTo": 5,
+        "attrs": {
+          "latex": "~x~"
+        },
+        "opaque": true,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 4,
+            "softInside": true
+          },
+          {
+            "from": 4,
+            "to": 5
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "outside",
+            "kind": "math-render",
+            "attrs": {
+              "latex": "~x~"
+            },
+            "side": -1
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "H~2~O",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 2,
+        "to": 3,
+        "openFrom": 1,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 4
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "E=mc^2^",
+    "spans": [
+      {
+        "type": "sup",
+        "from": 5,
+        "to": 6,
+        "openFrom": 4,
+        "openTo": 5,
+        "closeFrom": 6,
+        "closeTo": 7
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~a b~",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "^a b^",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "~a\\ b~",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 1,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 5,
+        "closeTo": 6
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~a\\~b~",
+    "spans": [
+      {
+        "type": "escape",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 4,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 3,
+            "softInside": true
+          }
+        ]
+      },
+      {
+        "type": "sub",
+        "from": 1,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 5,
+        "closeTo": 6
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~a\\\\~",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 1,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 4,
+        "closeTo": 5
+      },
+      {
+        "type": "escape",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 4,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 3,
+            "softInside": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "^a\\^b^",
+    "spans": [
+      {
+        "type": "escape",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 4,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 3,
+            "softInside": true
+          }
+        ]
+      },
+      {
+        "type": "sup",
+        "from": 1,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 5,
+        "closeTo": 6
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~a^b^~",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 1,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 5,
+        "closeTo": 6
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~~x~~",
+    "spans": [
+      {
+        "type": "strike",
+        "from": 2,
+        "to": 3,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~~~x~~~",
+    "spans": [
+      {
+        "type": "strike",
+        "from": 3,
+        "to": 4,
+        "openFrom": 1,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 6
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~~5~10~~",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 4,
+        "to": 6,
+        "openFrom": 3,
+        "openTo": 4,
+        "closeFrom": 6,
+        "closeTo": 7
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~a~~b~",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 1,
+        "to": 2,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 2,
+        "closeTo": 3
+      },
+      {
+        "type": "sub",
+        "from": 4,
+        "to": 5,
+        "openFrom": 3,
+        "openTo": 4,
+        "closeFrom": 5,
+        "closeTo": 6
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "*~x~*",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 2,
+        "to": 3,
+        "openFrom": 1,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 4
+      },
+      {
+        "type": "em",
+        "from": 1,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 4,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "[~x~](u)",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 2,
+        "to": 3,
+        "openFrom": 1,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 4
+      },
+      {
+        "type": "link",
+        "from": 1,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 4,
+        "closeTo": 8,
+        "attrs": {
+          "href": "u",
+          "title": null
+        }
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "`~x~`",
+    "spans": [
+      {
+        "type": "code",
+        "from": 1,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 4,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "\\~x\\~",
+    "spans": [
+      {
+        "type": "escape",
+        "from": 1,
+        "to": 2,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 2,
+        "closeTo": 2,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 1,
+            "softInside": true
+          }
+        ]
+      },
+      {
+        "type": "escape",
+        "from": 4,
+        "to": 5,
+        "openFrom": 3,
+        "openTo": 4,
+        "closeFrom": 5,
+        "closeTo": 5,
+        "delimRanges": [
+          {
+            "from": 3,
+            "to": 4,
+            "softInside": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": ":smile:",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 0,
+        "to": 7,
+        "openFrom": 0,
+        "openTo": 0,
+        "closeFrom": 7,
+        "closeTo": 7,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 7
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 0,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a :smile: b",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 2,
+        "to": 9,
+        "openFrom": 2,
+        "openTo": 2,
+        "closeFrom": 9,
+        "closeTo": 9,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 9
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 2,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": ":bogus:",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "::smile::",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 1,
+        "to": 8,
+        "openFrom": 1,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 8,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 8
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a:smile:b",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 1,
+        "to": 8,
+        "openFrom": 1,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 8,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 8
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": ":smile::smile:",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 0,
+        "to": 7,
+        "openFrom": 0,
+        "openTo": 0,
+        "closeFrom": 7,
+        "closeTo": 7,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 7
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 0,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      },
+      {
+        "type": "emoji",
+        "from": 7,
+        "to": 14,
+        "openFrom": 7,
+        "openTo": 7,
+        "closeFrom": 14,
+        "closeTo": 14,
+        "delimRanges": [
+          {
+            "from": 7,
+            "to": 14
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 7,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "*:smile:*",
+    "spans": [
+      {
+        "type": "em",
+        "from": 1,
+        "to": 8,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 9
+      },
+      {
+        "type": "emoji",
+        "from": 1,
+        "to": 8,
+        "openFrom": 1,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 8,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 8
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "[:smile:](u)",
+    "spans": [
+      {
+        "type": "link",
+        "from": 1,
+        "to": 8,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 12,
+        "attrs": {
+          "href": "u",
+          "title": null
+        }
+      },
+      {
+        "type": "emoji",
+        "from": 1,
+        "to": 8,
+        "openFrom": 1,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 8,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 8
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "`:smile:`",
+    "spans": [
+      {
+        "type": "code",
+        "from": 1,
+        "to": 8,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 9
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "\\:smile:",
+    "spans": [
+      {
+        "type": "escape",
+        "from": 1,
+        "to": 2,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 2,
+        "closeTo": 2,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 1,
+            "softInside": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": ":+1:",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 0,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 0,
+        "closeFrom": 4,
+        "closeTo": 4,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 4
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 0,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "👍",
+              "len": "4"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": ":-1:",
+    "spans": [
+      {
+        "type": "emoji",
+        "from": 0,
+        "to": 4,
+        "openFrom": 0,
+        "openTo": 0,
+        "closeFrom": 4,
+        "closeTo": 4,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 4
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 0,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "👎",
+              "len": "4"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "~:smile:~",
+    "spans": [
+      {
+        "type": "sub",
+        "from": 1,
+        "to": 8,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 9
+      },
+      {
+        "type": "emoji",
+        "from": 1,
+        "to": 8,
+        "openFrom": 1,
+        "openTo": 1,
+        "closeFrom": 8,
+        "closeTo": 8,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 8
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "always",
+            "kind": "emoji",
+            "attrs": {
+              "glyph": "😄",
+              "len": "7"
+            },
+            "side": -1,
+            "stopEvents": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "hello",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "a *b* c",
+    "spans": [
+      {
+        "type": "em",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "**a**",
+    "spans": [
+      {
+        "type": "strong",
+        "from": 2,
+        "to": 3,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 5
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "[t](u)",
+    "spans": [
+      {
+        "type": "link",
+        "from": 1,
+        "to": 2,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 2,
+        "closeTo": 6,
+        "attrs": {
+          "href": "u",
+          "title": null
+        }
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "[t](u \"ti\")",
+    "spans": [
+      {
+        "type": "link",
+        "from": 1,
+        "to": 2,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 2,
+        "closeTo": 11,
+        "attrs": {
+          "href": "u",
+          "title": "ti"
+        }
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "[](u)",
+    "spans": [
+      {
+        "type": "link",
+        "from": 1,
+        "to": 1,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 1,
+        "closeTo": 5,
+        "attrs": {
+          "href": "u",
+          "title": null
+        },
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 1,
+            "forceVisible": true
+          },
+          {
+            "from": 1,
+            "to": 3,
+            "forceVisible": true
+          },
+          {
+            "from": 4,
+            "to": 5,
+            "forceVisible": true
+          }
+        ],
+        "extraDecorations": [
+          {
+            "from": 3,
+            "to": 4,
+            "nodeName": "a",
+            "attrs": {
+              "data-href": "u"
+            }
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "![a](x.png)",
+    "spans": [
+      {
+        "type": "image",
+        "from": 2,
+        "to": 3,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 11,
+        "attrs": {
+          "src": "x.png",
+          "title": null
+        },
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 11,
+            "softInside": true
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 11,
+            "when": "always",
+            "kind": "image-render",
+            "attrs": {
+              "src": "x.png",
+              "alt": "a"
+            }
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "<https://a.b/~x~>",
+    "spans": [
+      {
+        "type": "autolink",
+        "from": 1,
+        "to": 16,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 16,
+        "closeTo": 17,
+        "attrs": {
+          "href": "https://a.b/~x~"
+        }
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a  \nb",
+    "spans": [],
+    "atoms": [
+      {
+        "at": 1,
+        "node": "hard_break"
+      }
+    ]
+  },
+  {
+    "text": "a\\\nb",
+    "spans": [],
+    "atoms": [
+      {
+        "at": 1,
+        "node": "hard_break"
+      }
+    ]
+  },
+  {
+    "text": "a\nb",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "a \\* b",
+    "spans": [
+      {
+        "type": "escape",
+        "from": 3,
+        "to": 4,
+        "openFrom": 2,
+        "openTo": 3,
+        "closeFrom": 4,
+        "closeTo": 4,
+        "delimRanges": [
+          {
+            "from": 2,
+            "to": 3,
+            "softInside": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a \\ b",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "a\\\\ b",
+    "spans": [
+      {
+        "type": "escape",
+        "from": 2,
+        "to": 3,
+        "openFrom": 1,
+        "openTo": 2,
+        "closeFrom": 3,
+        "closeTo": 3,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 2,
+            "softInside": true
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "x &amp; y",
+    "spans": [],
+    "atoms": []
+  },
+  {
+    "text": "![:smile:](u)",
+    "spans": [
+      {
+        "type": "image",
+        "from": 2,
+        "to": 9,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 9,
+        "closeTo": 13,
+        "attrs": {
+          "src": "u",
+          "title": null
+        },
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 13,
+            "softInside": true
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 13,
+            "when": "always",
+            "kind": "image-render",
+            "attrs": {
+              "src": "u",
+              "alt": ":smile:"
+            }
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "$a\\*b$",
+    "spans": [
+      {
+        "type": "inline_math",
+        "from": 1,
+        "to": 5,
+        "openFrom": 0,
+        "openTo": 1,
+        "closeFrom": 5,
+        "closeTo": 6,
+        "attrs": {
+          "latex": "a\\*b"
+        },
+        "opaque": true,
+        "delimRanges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 5,
+            "softInside": true
+          },
+          {
+            "from": 5,
+            "to": 6
+          }
+        ],
+        "widgetDecorations": [
+          {
+            "pos": 1,
+            "when": "outside",
+            "kind": "math-render",
+            "attrs": {
+              "latex": "a\\*b"
+            },
+            "side": -1
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "==a ==b== c==",
+    "spans": [
+      {
+        "type": "highlight",
+        "from": 6,
+        "to": 7,
+        "openFrom": 4,
+        "openTo": 6,
+        "closeFrom": 7,
+        "closeTo": 9
+      },
+      {
+        "type": "highlight",
+        "from": 2,
+        "to": 11,
+        "openFrom": 0,
+        "openTo": 2,
+        "closeFrom": 11,
+        "closeTo": 13
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "<u>**b**</u>",
+    "spans": [
+      {
+        "type": "strong",
+        "from": 5,
+        "to": 6,
+        "openFrom": 3,
+        "openTo": 5,
+        "closeFrom": 6,
+        "closeTo": 8
+      },
+      {
+        "type": "underline",
+        "from": 3,
+        "to": 8,
+        "openFrom": 0,
+        "openTo": 3,
+        "closeFrom": 8,
+        "closeTo": 12,
+        "wrap": true
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "a[^1]b",
+    "spans": [
+      {
+        "type": "footnote_ref",
+        "from": 1,
+        "to": 5,
+        "openFrom": 1,
+        "openTo": 1,
+        "closeFrom": 5,
+        "closeTo": 5,
+        "attrs": {
+          "id": "1"
+        },
+        "wrap": true,
+        "delimRanges": [
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 4,
+            "to": 5
+          }
+        ]
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "<!-- c -->",
+    "spans": [
+      {
+        "type": "html_comment",
+        "from": 0,
+        "to": 10,
+        "openFrom": 0,
+        "openTo": 0,
+        "closeFrom": 10,
+        "closeTo": 10,
+        "opaque": true
+      }
+    ],
+    "atoms": []
+  },
+  {
+    "text": "see https://x.com.",
+    "spans": [
+      {
+        "type": "autolink",
+        "from": 4,
+        "to": 17,
+        "openFrom": 4,
+        "openTo": 4,
+        "closeFrom": 17,
+        "closeTo": 17,
+        "attrs": {
+          "href": "https://x.com"
+        },
+        "opaque": true
+      }
+    ],
+    "atoms": []
+  }
+]

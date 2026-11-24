@@ -1,0 +1,17 @@
+{
+  "name": "@texto/export-runtime",
+  "version": "0.0.1",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.11.0",
+    "css-tree": "^3.2.1"
+  }
+}

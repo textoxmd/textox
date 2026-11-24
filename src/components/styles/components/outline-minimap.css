@@ -1,0 +1,225 @@
+/* ============================================
+   大纲迷你地图（Codex 导航栏风格）视图
+   ============================================ */
+
+/* 迷你地图模式：面板退化为贴紧窗口右沿的极简窄条（绝对定位悬浮，不挤压编辑器） */
+.outline-panel-float.minimap-mode {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  /* 允许索引条向左延伸进编辑器区域，不被面板裁切 */
+  overflow: visible;
+  /* 面板透明区域不拦截鼠标，仅索引项可交互 */
+  pointer-events: none;
+}
+
+.outline-panel-float.minimap-mode .outline-minimap-item {
+  pointer-events: auto;
+}
+
+.outline-panel-float.minimap-mode .outline-panel-body {
+  overflow: visible;
+}
+
+/* 迷你地图模式下，源码编辑器右侧留出索引条空间，避免代码内容被索引条遮挡 */
+.editor-container:has(.outline-panel-float.minimap-mode) .source-code-editor .cm-content {
+  padding-right: 52px;
+}
+
+/* ─── 索引条容器 ─────────────────────────────── */
+
+.outline-minimap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 30px 16px;
+}
+
+.outline-minimap-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  width: 36px;
+  margin: auto 0;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* 让整条索引成为命中区域：按钮之间 2px 的间隙原本不是命中目标，
+     鼠标在条目间移动会「穿透」到编辑器、触发外层 onMouseLeave，
+     使预览卡瞬间跳到 (0,0) 再回位 —— 即右上角那片卡片宽的闪烁 */
+  pointer-events: auto;
+  /* 切换文件时整条索引淡入；延迟 0.15s 再开始，让大纲晚于编辑器内容出现 */
+  animation: outline-minimap-fade-in 0.2s ease-out 0.15s backwards;
+  /* 两端淡出遮罩 */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 12px,
+    black calc(100% - 12px),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 12px,
+    black calc(100% - 12px),
+    transparent
+  );
+}
+
+@keyframes outline-minimap-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.outline-minimap-rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── 每个索引项（一条消息/标题对应一个按钮） ─── */
+
+.outline-minimap-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 10px;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 短横线标记：宽度由 --marker-progress（0→1）驱动 scaleX，
+   颜色由 --marker-intensity（0→1）驱动透明度（静止淡、当前亮） */
+.outline-minimap-marker {
+  display: block;
+  width: 36px;
+  height: 2px;
+  flex-shrink: 0;
+  border-radius: 1px;
+  background: color-mix(
+    in oklch,
+    var(--primary) calc(38% + 62% * var(--marker-intensity, 0)),
+    transparent
+  );
+  transform-origin: right center;
+  transform: scaleX(
+    calc(var(--rest, 0.278) + (1 - var(--rest, 0.278)) * var(--marker-progress, 0))
+  );
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  will-change: transform;
+}
+
+/* ─── 悬停预览卡：portal 到 body，常驻挂载，通过尺寸（scaleY）显隐 ─── */
+
+.outline-minimap-tooltip {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 320px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background-color: var(--popover, var(--sidebar));
+  border: 1px solid var(--sidebar-border, var(--border));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateY(-50%) scaleY(0);
+  transform-origin: top center;
+  transition: transform 0.15s ease;
+}
+
+.outline-minimap-tooltip.is-visible {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.outline-minimap-tooltip-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.outline-minimap-tooltip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--directory-tree-font-size-item, 13px);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.outline-minimap-tooltip-excerpt {
+  height: 4.5em;
+  overflow: hidden;
+  line-height: 1.5;
+  font-size: var(--directory-tree-font-size-item, 13px);
+  color: color-mix(in oklch, var(--muted-foreground) 80%, transparent);
+  word-break: break-word;
+}
+
+/* 摘要内块级/行内元素紧凑化，避免默认边距撑高预览卡 */
+.outline-minimap-tooltip-excerpt p {
+  margin: 0;
+}
+
+.outline-minimap-tooltip-excerpt ul,
+.outline-minimap-tooltip-excerpt ol {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.outline-minimap-tooltip-excerpt li {
+  margin: 0;
+}
+
+/* 任务列表（checkbox）：去掉圆点，收紧 checkbox 间距 */
+.outline-minimap-tooltip-excerpt ul.contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.outline-minimap-tooltip-excerpt li.task-list-item {
+  list-style: none;
+}
+
+.outline-minimap-tooltip-excerpt .task-list-item-checkbox {
+  margin: 0 0.4em 0 0;
+  vertical-align: -1px;
+}
+
+.outline-minimap-tooltip-excerpt blockquote {
+  margin: 0;
+  padding-left: 0.6em;
+  border-left: 2px solid var(--border);
+}
+
+.outline-minimap-tooltip-excerpt code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.92em;
+}
+
+.outline-minimap-tooltip-excerpt a {
+  color: var(--primary);
+  text-decoration: none;
+}

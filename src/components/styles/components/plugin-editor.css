@@ -1,0 +1,83 @@
+/* 文件类型编辑器槽位（FileEditorHost）：首次挂载后常驻，
+   非活动时隐藏而非卸载，避免整实例重建；显示时轻微淡入。 */
+.plugin-editor-slot {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.plugin-editor-slot.plugin-editor-slot-active {
+  display: flex;
+  flex-direction: column;
+  animation: plugin-editor-slot-in 0.16s ease-out;
+}
+
+@keyframes plugin-editor-slot-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 打开文件类型编辑器时移除 .editor-area 的 layout containment：
+   编辑器（如白板）用 position:fixed 相对视口定位，contain:layout 会锚定到 editor-area */
+.editor-area.plugin-editor-active {
+  contain: none;
+}
+
+/* FileEditorHost 懒加载占位 */
+.plugin-editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-size: 14px;
+  color: var(--muted-foreground, #71717a);
+  animation: plugin-editor-loading-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes plugin-editor-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* FileEditorHost 渲染报错时的护栏 fallback（PluginErrorBoundary） */
+.plugin-editor-error {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-size: 14px;
+  color: var(--muted-foreground, #71717a);
+}
+
+.plugin-editor-error-title {
+  font-weight: 600;
+  color: var(--foreground, #18181b);
+}
+
+.plugin-editor-error-detail {
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+}
+
+.plugin-editor-error-retry {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #e4e4e7);
+  background: var(--background, #fff);
+  cursor: pointer;
+}

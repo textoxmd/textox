@@ -1,0 +1,14 @@
+{
+  identifier: "com.texto.markdown.lite",
+  productName: "Textox Lite",
+  build: {
+    beforeBuildCommand: "bun run scripts/build/frontend.mjs build --edition lite",
+    beforeDevCommand: "bun run scripts/build/frontend.mjs dev --edition lite",
+    devUrl: "http://localhost:1420",
+  },
+  bundle: {
+    resources: {
+      "resources/plugins": "plugins",
+    },
+  },
+}

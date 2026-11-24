@@ -1,0 +1,867 @@
+:root {
+  --titlebar-bg: var(--background);
+  --titlebar-sidebar-bg: var(--muted);
+  --titlebar-text-primary: var(--foreground);
+  --titlebar-text-secondary: var(--muted-foreground);
+
+  --titlebar-base-unit: 1rem;
+  --titlebar-height: 32px;
+  --titlebar-left-width: 85px;
+  --titlebar-right-width: 85px;
+  --titlebar-settings-width: 200px;
+
+  --titlebar-font-size: 13px;
+
+  --titlebar-status-saving: var(--primary);
+  --titlebar-status-unsaved: var(--destructive);
+  --titlebar-status-saved: var(--chart-2);
+
+  --titlebar-breathe-color: oklch(0.646 0.222 41.116);
+  --titlebar-breathe-duration: 2.5s;
+}
+
+/* ============================================
+   Base title-bar (shared)
+   ============================================ */
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  height: var(--titlebar-height);
+  padding: 0;
+  background-color: var(--background);
+  user-select: none;
+  cursor: default;
+  -webkit-app-region: drag;
+  /* 颜色跟随全局主题过渡，避免与内容区不同步 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              border-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.title-bar.inactive {
+  /* inherited by children via color-mix */
+}
+
+/* ============================================
+   .editor-area — Editor area titlebar
+   ============================================ */
+
+.editor-area .title-bar {
+  justify-content: space-between;
+  /* 背景由父容器 .editor-area 统一持有，保证与内容区同步渐变 */
+  background-color: transparent;
+}
+
+.editor-area .title-bar-left {
+  display: flex;
+  align-items: center;
+  flex: 0 0 var(--titlebar-left-width);
+  min-width: var(--titlebar-left-width);
+  height: 100%;
+}
+
+.editor-area .title-bar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex: 1;
+  /* 关键：没有 min-width: 0 时 flex 子项的最小内容宽度会把窗口标题撑爆，
+     导致 .window-title 的 text-overflow: ellipsis 永远不生效。 */
+  min-width: 0;
+  height: 100%;
+}
+
+.editor-area .titlebar-title-area {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.editor-area .title-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 0 0 var(--titlebar-right-width);
+  min-width: var(--titlebar-right-width);
+  height: 100%;
+  padding-right: 12px;
+  justify-content: flex-end;
+}
+
+/* Windows overrides for editor */
+.editor-area .title-bar.windows .title-bar-left {
+  flex: 0 0 auto;
+  min-width: 0;
+  gap: 4px;
+}
+
+.editor-area .title-bar.windows .title-bar-center {
+  justify-content: center;
+  padding-left: 0;
+  gap: var(--space-2);
+}
+
+.editor-area .title-bar.windows .title-bar-right {
+  flex: 0 0 auto;
+  min-width: auto;
+  padding-right: 0;
+  gap: 0;
+}
+
+/* Sidebar collapsed — expand button in center */
+.editor-area .title-bar:not(.with-sidebar) .title-bar-center {
+  position: relative;
+}
+
+.editor-area .title-bar:not(.with-sidebar) .title-bar-center .toggle-sidebar-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-app-region: no-drag;
+}
+
+/* Show sidebar toggle on hover (2s delay before hiding) */
+.editor-area .title-bar.titlebar-hovered .toggle-sidebar-btn,
+#sidebar .title-bar.titlebar-hovered .toggle-sidebar-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* IR/SV 标签页 — 悬浮标题栏才显示（2s 延迟隐藏） */
+.editor-area .title-bar [data-slot="tabs"] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+}
+
+/* IR/SV 标签页 — 窗口未聚焦时淡显（与侧边栏按钮一致） */
+.window-inactive .editor-area .title-bar [data-slot="tabs"],
+.editor-area .title-bar.inactive [data-slot="tabs"] {
+  opacity: 0.35;
+}
+
+.editor-area .title-bar.titlebar-hovered [data-slot="tabs"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-layout .editor-area .title-bar [data-slot="tabs"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile layout overrides for editor */
+.mobile-layout .editor-area .title-bar-right {
+  flex: 0 0 auto;
+  min-width: auto;
+  gap: var(--space-1);
+  padding-right: var(--space-2);
+}
+
+.mobile-layout .editor-area .title-bar-left {
+  flex: 0 0 80px;
+  min-width: 80px;
+}
+
+.mobile-layout .editor-area .title-bar-center {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mobile-layout .editor-area .window-title {
+  max-width: 100%;
+}
+
+/* ============================================
+   #sidebar — Sidebar area titlebar (simplified)
+   ============================================ */
+
+#sidebar .title-bar {
+  width: 100%;
+  height: var(--titlebar-height);
+  flex-shrink: 0;
+  /* 背景由父容器 .sidebar-area 统一持有，保证与内容区同步渐变 */
+  background-color: transparent;
+  /* border-right: 1px solid var(--sidebar-border); */
+  justify-content: flex-end;
+  padding: 0 var(--space-xs) 0 0;
+  gap: 0;
+}
+
+#sidebar .title-bar.sidebar-right {
+  border-right: none;
+  border-left: 1px solid var(--sidebar-border);
+}
+
+#sidebar .title-bar .toggle-sidebar-btn {
+  -webkit-app-region: no-drag;
+  position: absolute;
+  right: var(--space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ============================================
+   Window title & rename
+   ============================================ */
+
+.window-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  /* 现在是真 <button>，先抹掉 UA 默认的按钮外观再套标题样式 */
+  gap: 0;
+  padding: 0 6px;
+  margin: 0 -6px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  border-radius: 4px;
+  transition: background-color 120ms ease;
+  font-size: var(--titlebar-font-size);
+  font-family: var(--font-family-base);
+  color: var(--titlebar-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  cursor: default;
+}
+
+/* 只有真实触发器（button）才是可点的；空文档兜底用 span，不能有手型与悬停底色 */
+button.window-title {
+  cursor: pointer;
+}
+
+button.window-title:hover {
+  background: color-mix(in oklch, var(--foreground) 7%, transparent);
+}
+
+/* 键盘用户聚焦文件名时给一个可见落点（回车 / 空格展开卡片） */
+.window-title:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 中间省略：头段可压缩并自带省略号，尾段固定宽度 */
+.window-title-head {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.window-title-tail {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.window-inactive .window-title,
+.title-bar.inactive .window-title {
+  color: color-mix(in oklch, var(--titlebar-text-secondary) 50%, transparent);
+}
+
+.window-inactive .titlebar-file-ext,
+.title-bar.inactive .titlebar-file-ext {
+  color: color-mix(in oklch, var(--muted-foreground) 40%, transparent);
+  background-color: color-mix(in oklch, var(--muted-foreground) 8%, var(--background));
+}
+
+.window-inactive .modified-indicator,
+.title-bar.inactive .modified-indicator {
+  animation: none;
+  color: color-mix(in oklch, var(--titlebar-breathe-color) 50%, transparent);
+}
+
+.window-inactive .toggle-sidebar-btn,
+.title-bar.inactive .toggle-sidebar-btn {
+  opacity: 0.35;
+}
+
+.window-inactive .sidebar-expand-btn,
+.title-bar.inactive .sidebar-expand-btn {
+  opacity: 0.4;
+}
+
+.window-inactive .titlebar-lock-btn,
+.title-bar.inactive .titlebar-lock-btn {
+  opacity: 0.4;
+}
+
+.window-inactive .settings-content-title,
+.window-inactive .settings-content-titlebar-icon {
+  color: color-mix(in oklch, var(--titlebar-text-secondary) 50%, transparent);
+}
+
+.window-inactive .window-titlebar-title {
+  color: color-mix(in oklch, var(--titlebar-text-secondary) 50%, transparent);
+}
+
+/* ============================================
+   Modified indicator
+   ============================================ */
+
+.modified-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  vertical-align: middle;
+  color: var(--breathe-color, var(--titlebar-breathe-color));
+  animation: breathe var(--titlebar-breathe-duration) ease-in-out infinite;
+}
+
+/* ============================================
+   External conflict indicator
+   ============================================ */
+
+.conflict-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  vertical-align: middle;
+  color: var(--warning);
+}
+
+.window-inactive .conflict-indicator,
+.title-bar.inactive .conflict-indicator {
+  color: color-mix(in oklch, var(--warning) 50%, transparent);
+}
+
+/* ============================================
+   File extension badge
+   ============================================ */
+
+.titlebar-file-ext {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+  height: 14px;
+  /* 逻辑方向：RTL 下徽章位于最左，间距需落在朝向文件名的一侧 */
+  margin-inline-start: var(--space-1);
+  font-size: 10px;
+  font-weight: var(--font-weight-medium, 500);
+  color: color-mix(in oklch, var(--muted-foreground) 80%, var(--background));
+  background-color: color-mix(in oklch, var(--muted-foreground) 15%, var(--background));
+  border-radius: var(--radius-md);
+  text-transform: lowercase;
+  flex-shrink: 0;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+    color: var(--breathe-color, var(--titlebar-breathe-color));
+  }
+  50% {
+    opacity: 0.5;
+    color: color-mix(in srgb, var(--breathe-color, var(--titlebar-breathe-color)) 70%, white);
+  }
+}
+
+/* ============================================
+   Sidebar toggle buttons
+   ============================================ */
+
+.toggle-sidebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 21px;
+  height: 21px;
+  padding: var(--btn-icon-padding);
+  border: none;
+  border-radius: var(--btn-icon-radius);
+  background-color: transparent;
+  color: var(--titlebar-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  outline: none;
+  /* opacity 保持悬停显示速度，颜色跟随全局主题过渡 */
+  transition: opacity var(--transition-slow),
+              background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+  backface-visibility: hidden;
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: color-mix(in oklch, var(--muted-foreground) 15%, transparent);
+  color: var(--titlebar-text-primary);
+}
+
+.mobile-layout .toggle-sidebar-btn {
+  opacity: 1;
+  pointer-events: auto;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+}
+
+.sidebar-expand-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  padding: var(--btn-icon-padding);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toggle-sidebar-btn svg {
+  pointer-events: none;
+}
+
+.sidebar-collapse-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: opacity var(--transition-normal);
+}
+
+.toggle-sidebar-btn:hover .sidebar-collapse-icon {
+  opacity: 1;
+}
+
+.sidebar-expand-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: opacity var(--transition-normal);
+}
+
+/* ============================================
+   Save status
+   ============================================ */
+
+.save-status {
+  font-size: var(--titlebar-font-size);
+  color: var(--titlebar-text-secondary);
+}
+
+.save-status.saving {
+  color: var(--titlebar-status-saving);
+}
+
+.save-status.unsaved {
+  color: var(--titlebar-status-unsaved);
+}
+
+.save-status.saved {
+  color: var(--titlebar-status-saved);
+}
+
+/* ============================================
+   Traffic light spacer (macOS)
+   ============================================ */
+
+.traffic-light-spacer {
+  width: 0;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Windows — menu button
+   ============================================ */
+
+.titlebar-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  padding: var(--btn-icon-padding);
+  border: none;
+  margin: 0 2px;
+  border-radius: var(--btn-icon-radius);
+  background-color: transparent;
+  color: var(--titlebar-text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  outline: none;
+  user-select: none;
+}
+
+.titlebar-menu-btn:hover {
+  background-color: rgba(128, 128, 128, 0.15);
+}
+
+.titlebar-menu-btn:active {
+  background-color: rgba(128, 128, 128, 0.25);
+}
+
+/* ============================================
+   Lock button
+   ============================================ */
+
+.titlebar-lock-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--titlebar-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.titlebar-title-area:hover .titlebar-lock-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.titlebar-lock-btn.locked {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 文件被删除/移到废纸篓时的恢复按钮：常驻显示并使用红色强调 */
+.titlebar-lock-btn.recover-file {
+  opacity: 1;
+  pointer-events: auto;
+  color: var(--destructive);
+}
+
+.window-inactive .titlebar-lock-btn.recover-file,
+.title-bar.inactive .titlebar-lock-btn.recover-file {
+  opacity: 0.55;
+  color: color-mix(in oklch, var(--destructive) 60%, transparent);
+}
+
+/* ============================================
+   Touch devices (iPad / tablets) — no hover:
+   keep titlebar controls always visible
+   ============================================ */
+@media (hover: none) {
+  .editor-area .title-bar .toggle-sidebar-btn,
+  #sidebar .title-bar .toggle-sidebar-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .editor-area .title-bar [data-slot="tabs"] {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .titlebar-lock-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* JS 检测到的触屏设备（iPad 模拟器用 Mac 鼠标时 hover 媒体查询不可靠） */
+.touch-device .editor-area .title-bar .toggle-sidebar-btn,
+.touch-device #sidebar .title-bar .toggle-sidebar-btn {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.touch-device .editor-area .title-bar [data-slot="tabs"] {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.touch-device .titlebar-lock-btn {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ============================================
+   Window controls (Windows)
+   ============================================ */
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.window-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 100%;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  color: var(--titlebar-text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
+  position: relative;
+  z-index: 1;
+}
+
+.window-control-button svg {
+  width: 10px;
+  height: 10px;
+}
+
+.window-control-button:hover {
+  background-color: color-mix(in oklch, var(--foreground) 15%, transparent);
+}
+
+.window-control-button:active {
+  background-color: color-mix(in oklch, var(--foreground) 25%, transparent);
+}
+
+.window-control-button.close:hover {
+  background-color: var(--destructive);
+  color: oklch(1 0 0);
+}
+
+.window-control-button.close:active {
+  background-color: color-mix(in oklch, var(--destructive) 80%, var(--foreground));
+  color: oklch(1 0 0);
+}
+
+/* ============================================
+   Filename rename
+   ============================================ */
+
+.titlebar-filename {
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.titlebar-filename:hover {
+  background-color: color-mix(in oklch, var(--muted-foreground) 10%, transparent);
+}
+
+.titlebar-rename-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.glass-rename-popover {
+  -webkit-app-region: no-drag;
+  user-select: text;
+  padding: 10px 12px;
+  border-radius: 8px;
+  min-width: 220px;
+  background-color: var(--popover) !important;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ============================================
+   Narrow viewport — compact title bar
+   ============================================ */
+
+@media (max-width: 600px) {
+  .editor-area .title-bar-left,
+  .editor-area .title-bar-right {
+    flex: 0 0 auto;
+    min-width: auto;
+  }
+
+  .editor-area .title-bar-right {
+    padding-right: var(--space-1);
+  }
+
+  .editor-area .titlebar-file-ext {
+    display: none;
+  }
+}
+
+/* ============================================
+   File info card (click on window title)
+   ============================================ */
+
+.titlebar-file-info-popup {
+  /* 局部变量：水平内边距与分隔线的负外边距必须成对，收口魔法数字 */
+  --fi-pad-x: 13px;
+  /* positioner 只做翻转/位移，不会缩容，窄窗口下需自行限制在视口内 */
+  width: min(302px, calc(100vw - 16px));
+  padding: 11px var(--fi-pad-x) 10px;
+  border-radius: 12px;
+
+  /* 与 .word-count-badge 同源的玻璃配方，参数更接近系统菜单 */
+  background: color-mix(in oklch, var(--popover) 74%, transparent);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.16),
+    0 2px 8px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  color: var(--foreground);
+  user-select: text;
+}
+
+.dark .titlebar-file-info-popup {
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  /* 暗色背景下 12% 前景色边框几乎不可见，略微提亮 */
+  border-color: color-mix(in oklch, var(--foreground) 16%, transparent);
+}
+
+/* WebKitGTK 旧版 / 关闭了合成层时不支持 backdrop-filter：退回实色，避免 26% 透光压正文 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .titlebar-file-info-popup {
+    background: var(--popover);
+  }
+}
+
+.titlebar-file-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.titlebar-file-info-name {
+  /* 无空格超长文件名需要换行，但必须封顶，否则卡片会被撑高盖住正文 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  word-break: break-all;
+  color: var(--foreground);
+}
+
+.titlebar-file-info-path-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: 2px;
+  min-width: 0;
+}
+
+.titlebar-file-info-path {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* 从尾部省略：溢出发生在左侧，路径的开头被裁掉 */
+  direction: rtl;
+  text-align: left;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 10.5px;
+  line-height: 21px;
+  color: var(--muted-foreground);
+  user-select: text;
+}
+
+/* RTL：direction: rtl 只负责溢出方向，未溢出时的对齐需跟随文档方向，
+   否则短路径会被推到盒子左缘贴住操作按钮 */
+html[dir="rtl"] .titlebar-file-info-path {
+  text-align: right;
+}
+
+.titlebar-file-info-path-temp {
+  direction: ltr;
+  font-family: var(--font-family-base);
+  font-size: 11px;
+}
+
+.titlebar-file-info-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  /* 设计规格：28px 图标按钮 6.5px 圆角。不用 var(--radius-sm)（实际解析为 2px，
+     variables.css 的 unlayered :root 覆盖了 @theme inline 里的定义） */
+  border-radius: 6.5px;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.titlebar-file-info-action:hover {
+  background: color-mix(in oklch, var(--foreground) 9%, transparent);
+  color: var(--foreground);
+}
+
+.titlebar-file-info-action:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.titlebar-file-info-divider {
+  height: 1px;
+  /* 与 .titlebar-file-info-popup 的水平内边距成对 */
+  margin: 9px calc(var(--fi-pad-x) * -1);
+  background: color-mix(in oklch, var(--foreground) 9%, transparent);
+}
+
+.titlebar-file-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+}
+
+.titlebar-file-info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titlebar-file-info-row dt {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.titlebar-file-info-row dd {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11.5px;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  /* RTL 下 dd 位于左侧，物理 right 会朝中间对齐；end 跟随文档方向。
+     内容固定从左起（数字/时间），超长时在末尾省略，露出开头而非结尾 */
+  text-align: end;
+  direction: ltr;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

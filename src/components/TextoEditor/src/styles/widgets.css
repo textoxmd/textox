@@ -1,0 +1,453 @@
+/*
+ * Editor chrome — required for the editor's interactive UI to work.
+ *
+ * Everything in this file is "ours": cursor decoration, syntax-hint
+ * dimming, NodeView innards, structured-block chrome (ref-def, yaml,
+ * code-fence lang input, etc.).
+ *
+ * Not in this file:
+ *   - Markdown content typography (h1-h6 sizes, link colors,
+ *     blockquote border, etc.) — that's a swappable theme; see
+ *     ./theme-github.css.
+ *
+ * Lib consumers should import this file once. Themes are imported on
+ * top of it.
+ */
+
+/* ─── createEditor() façade scaffolding ──────────────────────────── */
+/* Rendered editor and source textarea share a wrapper so toggling
+ * `editor.toggleSource()` keeps layout stable. The textarea baseline
+ * here is just enough to make source mode usable out of the box;
+ * consumers can override with their own font / colors. */
+.texto-web-wrap {
+    display: block;
+}
+.texto-web-editor-host {
+    display: block;
+}
+.texto-web-source {
+    display: block;
+    width: 100%;
+    /* Height is set by the JS `autoSizeSource` on each input — the
+   * textarea grows to match its content so the page never shows a
+   * nested scrollbar inside the source view. */
+    resize: none;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    font:
+        14px/1.65 ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+    background: transparent;
+    color: inherit;
+    white-space: pre-wrap;
+    word-break: break-word;
+    tab-size: 2;
+    box-sizing: border-box;
+    padding: 0;
+}
+.texto-web-source[hidden] {
+    display: none;
+}
+
+/* ─── PM root reset ──────────────────────────────────────────────── */
+.ProseMirror {
+    outline: none;
+    min-height: 168px;
+}
+.ProseMirror[contenteditable="true"]:focus {
+    outline: none;
+}
+
+/* ─── method-B syntax hints ──────────────────────────────────────── */
+.ProseMirror .syntax-hint {
+    color: #b0b0b0;
+    font-weight: normal;
+    font-style: normal;
+    user-select: none;
+}
+.ProseMirror .syntax-hint-italic {
+    color: #b0b0b0;
+    font-style: italic;
+    font-weight: normal;
+    user-select: none;
+}
+/* Delim char is present in the doc text but visually absent when the
+ * cursor is outside the mark's surrounding span. PM pos still tracks
+ * it; arrow keys may briefly land on a hidden delim and the char
+ * becomes visible as soon as the cursor enters the span. */
+.ProseMirror .syntax-hidden {
+    font-size: 0;
+    display: none;
+}
+
+/* HTML comment — wraps the entire `<!-- ... -->` source. The chars
+ * stay visible (no decoration hides them); the wrapper just dims so
+ * the user can see at a glance that this is a comment. */
+.ProseMirror mark-comment {
+    color: #999;
+    font-style: italic;
+}
+
+/* Heading-draft contour: while the cursor is inside a paragraph that
+ * starts with `# ` (etc), the whole paragraph reads as bold so the
+ * user sees the heading-to-be. The `# ` itself has .syntax-hint and
+ * stays at the paragraph's normal font-weight. */
+.ProseMirror .heading-draft-1,
+.ProseMirror .heading-draft-2,
+.ProseMirror .heading-draft-3,
+.ProseMirror .heading-draft-4,
+.ProseMirror .heading-draft-5,
+.ProseMirror .heading-draft-6 {
+    font-weight: bold;
+}
+
+/* ─── play caret + selection marker (test-pretty / fakeView) ─────── */
+.ProseMirror .play-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.15em;
+    margin: 0 -1px;
+    background: #1f1f1f;
+    vertical-align: text-bottom;
+    animation: play-caret-blink 1s step-end infinite;
+    user-select: none;
+    pointer-events: none;
+}
+@keyframes play-caret-blink {
+    50% {
+        opacity: 0;
+    }
+}
+.ProseMirror-focused .play-caret {
+    display: none;
+}
+.ProseMirror .selection-marker {
+    color: #1f1f1f;
+    font-weight: bold;
+    user-select: none;
+}
+.ProseMirror-focused .selection-marker {
+    display: none;
+}
+
+/* ─── reference link def — structured editable block ─────────────── */
+.ProseMirror ref-def {
+    display: block;
+    margin: 4px 0;
+    font:
+        13px/1.5 ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+    color: #444;
+}
+.ProseMirror ref-label,
+.ProseMirror ref-url,
+.ProseMirror ref-title {
+    display: inline-block;
+    min-width: 1em;
+}
+.ProseMirror ref-label::before {
+    content: "[ ";
+    color: #b0b0b0;
+    user-select: none;
+}
+.ProseMirror ref-label::after {
+    content: " ]: ";
+    color: #b0b0b0;
+    user-select: none;
+}
+.ProseMirror ref-url {
+    color: #0969da;
+}
+.ProseMirror ref-url[data-placeholder]::before {
+    content: attr(data-placeholder);
+    color: #b0b0b0;
+    font-style: italic;
+    text-decoration: underline;
+    user-select: none;
+}
+.ProseMirror ref-title {
+    color: #555;
+    padding-left: 0.6em;
+}
+.ProseMirror ref-title::before {
+    content: '" ';
+    color: #b0b0b0;
+    user-select: none;
+}
+.ProseMirror ref-title::after {
+    content: ' "';
+    color: #b0b0b0;
+    user-select: none;
+}
+.ProseMirror ref-title[data-placeholder]::before {
+    content: '" ' attr(data-placeholder) ' "';
+    color: #b0b0b0;
+    font-style: italic;
+    user-select: none;
+}
+.ProseMirror ref-title[data-placeholder]::after {
+    content: "";
+}
+.ProseMirror ref-label > .ProseMirror-trailingBreak,
+.ProseMirror ref-url > .ProseMirror-trailingBreak,
+.ProseMirror ref-title > .ProseMirror-trailingBreak {
+    display: none;
+}
+
+.ProseMirror .file-input {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.9em;
+    margin: 0 2px;
+    opacity: 0.6;
+}
+.ProseMirror .file-input:hover {
+    opacity: 1;
+}
+.ProseMirror img.image-render {
+    display: block;
+    margin: 4px 0;
+}
+/* Linked image badges render inline so the wrapping link stays on one
+ * line — the image is just the link's display content. */
+.ProseMirror img.image-render-inline {
+    display: inline-block;
+    margin: 0 2px;
+    vertical-align: middle;
+}
+
+/* ─── Task-list checkbox NodeView ────────────────────────────────── */
+/* Suppress the default list marker on items that carry a checkbox —
+ * the checkbox stands in for the bullet/number. Detect via :has() on
+ * the first child of the leading paragraph; covers both ul and ol. */
+.ProseMirror li:has(> p:first-child > .checkbox-frame:first-child) {
+    list-style: none;
+}
+
+/* Outer wrapper — extends the inline-block to the right with
+ * transparent padding so the native caret (which positions itself at
+ * the OUTER edge of an inline-block, not past the margin) ends up
+ * visually separated from the visible glyph. */
+.ProseMirror .checkbox-frame {
+    display: inline-block;
+    padding-right: 8px;
+    user-select: none;
+}
+.ProseMirror .checkbox {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: -0.18em;
+    border: 1.5px solid #888;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    box-sizing: border-box;
+}
+.ProseMirror .checkbox[data-checked="1"] {
+    background: #1f1f1f;
+    border-color: #1f1f1f;
+}
+.ProseMirror .checkbox[data-checked="1"]::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* ─── Fenced code NodeView chrome ────────────────────────────────── */
+.ProseMirror pre {
+    position: relative;
+}
+.ProseMirror pre .cb-chrome {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: -38px;
+    user-select: none;
+    z-index: 10;
+}
+.ProseMirror pre.cb-active .cb-chrome {
+    display: block;
+}
+.ProseMirror pre .cb-lang-input {
+    width: 130px;
+    padding: 4px 8px;
+    font:
+        12px ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+    border: 1px solid var(--border, #d0d0d0);
+    border-radius: 4px;
+    background: var(--cb-chrome-bg, var(--editor-code-bg, var(--muted, var(--background, #fff))));
+    color: var(--foreground, #333);
+    outline: none;
+    line-height: 1.5;
+}
+.ProseMirror pre .cb-lang-input:focus {
+    background: var(--accent, var(--muted, #f0f0f0));
+}
+.ProseMirror pre.cb-lang-focus .play-caret {
+    display: none;
+}
+
+/* Language dropdown styles */
+.ProseMirror pre .cb-lang-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    width: 130px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--cb-chrome-bg, var(--editor-code-bg, var(--muted, var(--background, #fff))));
+    border: 1px solid var(--border, #d0d0d0);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+.ProseMirror pre .cb-lang-item {
+    padding: 6px 10px;
+    font:
+        12px ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+    color: var(--foreground, #333);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 悬停/键盘高亮用中性半透明叠加：部分主题（如深色 default/spring）的
+   --accent 与 --muted 取值相同，直接用作背景会和下拉面板底色融在一起。 */
+.ProseMirror pre .cb-lang-item:hover {
+    background: rgba(127, 127, 127, 0.16);
+}
+
+.ProseMirror pre .cb-lang-item.selected {
+    background: rgba(127, 127, 127, 0.32);
+    box-shadow: inset 2px 0 0 var(--foreground, #333);
+}
+
+.ProseMirror pre .cb-lang-no-result {
+    color: var(--muted-foreground, #999);
+    cursor: default;
+}
+
+.ProseMirror pre .cb-lang-no-result:hover {
+    background: transparent;
+}
+
+/* ─── Floating toolbar chrome (body-mounted, shared) ─────────────── */
+/* Neutral chrome for body-mounted floating toolbars. The inline-format
+ * toolbar reuses these classes; the table plugin's own toolbar also
+ * targets `.floating-toolbar*`, while its table-private rules live in
+ * the plugin's `table.css`. */
+.floating-toolbar {
+    position: fixed;
+    display: none;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 5px;
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    font-family:
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+/* Floating inline-format toolbar container has a larger radius. */
+.fmt-toolbar {
+    border-radius: 999px;
+}
+.floating-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #555;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+.floating-toolbar-btn:hover {
+    background: #f0f0f0;
+    color: #1f1f1f;
+}
+.floating-toolbar-btn.active {
+    background: #e6e0f8;
+    color: #1f1f1f;
+}
+/* Floating inline-format toolbar buttons are round. */
+.fmt-toolbar .floating-toolbar-btn {
+    border-radius: 50%;
+}
+.floating-toolbar-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.floating-toolbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+.floating-toolbar-actions:empty {
+    display: none;
+}
+.floating-toolbar-sep {
+    width: 1px;
+    align-self: stretch;
+    background: #e3e3e3;
+    margin: 2px 4px;
+}
+.floating-toolbar-spacer {
+    flex: 1;
+    min-width: 12px;
+}
+
+/* ─── Inline math (MathJax rendered) ─────────────────────────────── */
+/* 行内公式渲染样式 */
+.ProseMirror .math-content-hidden {
+    display: none;
+}
+
+.ProseMirror math-jax {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.ProseMirror math-jax svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* 行内公式分隔符 */
+.ProseMirror .math-delim-open,
+.ProseMirror .math-delim-close {
+    display: inline;
+    user-select: none;
+}
+

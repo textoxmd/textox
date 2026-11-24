@@ -1,0 +1,6 @@
+/* `.hello-settings` 是给将来的自绘设置页准备的容器样式；
+   当前宿主只渲染 `static settingsFields`，没有对应 DOM，规则先留着备用。 */
+[data-plugin='app.textox.hello-world'] .hello-settings {
+  display: grid;
+  gap: 12px;
+}

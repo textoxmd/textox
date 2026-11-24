@@ -1,0 +1,83 @@
+/**
+ * 基础样式
+ * 包含全局样式、滚动条、通用工具类等
+ */
+
+/* ============================================
+   焦点和选择样式
+   ============================================ */
+
+::selection {
+  background-color: rgba(24, 144, 255, 0.2);
+  color: inherit;
+}
+
+/* ============================================
+   过渡动画
+   ============================================ */
+
+/* 为主题切换添加全局过渡效果 */
+/* 使用 :root 选择器确保所有使用 CSS 变量的元素同步过渡 */
+:root {
+  /* 定义过渡属性，让所有使用这些属性的元素同步动画 */
+  --theme-transition-duration: 0.25s;
+  --theme-transition-timing: ease-out;
+}
+
+/* 设置 color-scheme 让浏览器原生组件跟随主题 */
+html {
+  color-scheme: var(--color-scheme, light);
+}
+
+/* 为所有可能变化的颜色属性添加过渡 */
+/* 注意：初始加载时禁用过渡，防止暗色模式下的白色闪烁 */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, -webkit-text-fill-color;
+  transition-duration: 0s; /* 初始无过渡，由 JS 在加载完成后启用 */
+  transition-timing-function: var(--theme-transition-timing);
+}
+
+/* 页面加载完成后启用过渡效果 */
+html.theme-transition-enabled * {
+  transition-duration: var(--theme-transition-duration);
+}
+
+/* shadcn TabsTrigger：覆盖 transition-all 的 150ms 默认时长，
+   颜色跟随全局主题过渡，box-shadow/opacity 等交互效果保持快速 */
+[data-slot="tabs-trigger"] {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              border-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing),
+              box-shadow 0.15s ease,
+              opacity 0.15s ease;
+}
+
+/* 禁用编辑器内部元素的过渡效果，避免编辑时的闪烁 */
+.source-code-editor *,
+.cm-editor *,
+.ProseMirror * {
+  transition: none !important;
+}
+
+/* ============================================
+   响应式适配
+   ============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --page-padding-x: 30px;
+    --page-padding-y: 20px;
+  }
+
+  .vscode-search-panel {
+    width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-padding-x: 16px;
+    --page-padding-y: 12px;
+  }
+}
+

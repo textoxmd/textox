@@ -1,0 +1,942 @@
+/**
+ * 应用主布局样式
+ * 包含 App 根组件、主内容区、侧边栏、编辑器区域、空状态
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     基础颜色
+     ------------------------------------------ */
+  --app-text-primary: var(--foreground);
+  --app-text-secondary: var(--muted-foreground);
+  --app-text-quaternary: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+
+  --app-bg-primary: var(--background);
+
+  --app-border-primary: var(--border);
+
+  /* ------------------------------------------
+     尺寸
+     ------------------------------------------ */
+  --app-base-unit: 1rem;
+  --app-sidebar-min-width: 200px;
+  --app-empty-state-divider-position: 38.2%;
+  --app-empty-state-icon-size: 64px;
+  --app-empty-state-avatar-size: 64px;
+  --app-recent-folder-icon-size: 12px;
+
+  /* ------------------------------------------
+     间距
+     ------------------------------------------ */
+  --app-empty-state-gap-sm: calc(var(--app-base-unit) * 0.75);
+  --app-empty-state-gap-md: calc(var(--app-base-unit) * 1);
+  --app-empty-state-gap-lg: calc(var(--app-base-unit) * 2);
+  --app-empty-state-padding-left: calc(var(--app-base-unit) * 2.5);
+
+  /* ------------------------------------------
+     圆角
+     ------------------------------------------ */
+  --app-radius-sm: var(--radius-sm);
+  --app-radius-md: var(--radius-md);
+
+  /* ------------------------------------------
+     过渡动画
+     ------------------------------------------ */
+  /* width 驱动侧边栏展开/折叠的滑动效果，opacity 辅助内容淡入淡出，
+     颜色走全局主题过渡 */
+  --app-sidebar-slide-duration: 0.32s;
+  --app-sidebar-slide-timing: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --app-transition-sidebar: width var(--app-sidebar-slide-duration) var(--app-sidebar-slide-timing),
+    opacity 0.25s ease,
+    background-color var(--theme-transition-duration) var(--theme-transition-timing),
+    border-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+html,
+body,
+#root {
+  /* 布局 */
+  height: 100%;
+  overflow: hidden;
+}
+
+html {
+  /* 视觉 */
+  /* 直接使用 --background 确保与全局同步过渡 */
+  background-color: var(--background);
+}
+
+/* ============================================
+   App 主容器
+   ============================================ */
+
+.app {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+
+  /* 盒模型 */
+  height: 100vh;
+
+  /* 视觉 */
+  /* 直接使用 --background 确保与全局同步过渡 */
+  background-color: var(--background);
+}
+
+/* 移动端/iPad：为顶部状态栏与底部 Home 指示条让出空间 */
+.mobile-layout {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============================================
+   主内容区
+   ============================================ */
+
+.main-content {
+  /* 布局 */
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================
+   编辑器区域
+   ============================================ */
+
+.editor-area {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  contain: layout style;
+  will-change: width;
+
+  /* 视觉 */
+  /* 父容器统一持有内容页背景，标题栏/内容区透明，切换时同步渐变 */
+  background-color: var(--background);
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.editor-container {
+  /* 布局 */
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  /* 作为迷你地图大纲悬浮面板的定位参照 */
+  position: relative;
+}
+
+/* ProseMirror 编辑器容器 */
+.editor-container .markdown-editor {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 内容淡入动画 */
+.editor-content-fade-in {
+  animation: editorFadeIn 0.3s ease-out;
+}
+
+@keyframes editorFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================
+   侧边栏区域
+   ============================================ */
+
+.sidebar-area {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  will-change: width;
+  contain: layout style;
+
+  /* 视觉 */
+  opacity: 1;
+  background-color: var(--sidebar);
+
+  /* 交互 */
+  transition: var(--app-transition-sidebar);
+}
+
+/* 分割线由伪元素绘制：与拖拽操作柄（right: 0）的定位基准一致，
+   保证拖拽热区覆盖分割线，避免操作柄看起来偏在分割线左侧 */
+.sidebar-area::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--sidebar-border);
+  pointer-events: none;
+  /* 侧栏内容里的底部遮罩（如 Agent 操作栏）不能盖住分割线 */
+  z-index: 2;
+}
+
+.sidebar-area.right {
+  border-right: none;
+}
+
+.sidebar-area.right::after {
+  right: auto;
+  left: 0;
+}
+
+/* 拖拽调整大小时禁用过渡动画 */
+.sidebar-area.resizing {
+  transition: none !important;
+}
+
+/* 需要「直接显示布局」时抑制过渡动画：
+   移动端布局切换，以及打开文件夹等程序化展开侧边栏的场景。
+   用 data 属性而非 class，避免被 React 托管的 className 重写覆盖 */
+.sidebar-area[data-suppress-transition] {
+  transition: none !important;
+}
+
+/* 折叠状态 */
+.sidebar-area.collapsed {
+  /* 布局 */
+  width: 0 !important;
+  min-width: 0;
+  overflow: hidden;
+
+  /* 视觉 */
+  opacity: 0;
+}
+
+/* 大纲视图模式 */
+.sidebar-area.outline-only {
+  min-width: var(--app-sidebar-min-width);
+}
+
+.sidebar-area.outline-only.collapsed {
+  /* 布局 */
+  width: 0 !important;
+  min-width: 0;
+  overflow: hidden;
+
+  /* 视觉 */
+  opacity: 0;
+}
+
+/* ============================================
+   悬浮大纲面板
+   ============================================ */
+
+.outline-panel-float {
+  /* 布局：绝对定位浮层，覆盖在编辑器之上而非挤占其宽度，
+     使编辑器始终满宽、滚动条固定在容器最右缘（与迷你地图一致）；
+     正文避让由 .editor-container 上的 --outline-gutter 内边距实现 */
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: 12px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  /* 兜底：持久化的过宽值在小窗口中不得超过容器可用空间 */
+  max-width: calc(100% - 24px);
+  overflow: hidden;
+  transform: translateZ(0);
+
+  /* 视觉 */
+  background-color: var(--sidebar);
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  animation: outlinePanelFadeIn 0.2s ease-out;
+}
+
+.outline-panel-float.resizing {
+  transition: none !important;
+}
+
+/* 关闭时的右滑退出动画 */
+.outline-panel-float.closing {
+  animation: outlinePanelSlideOut 0.2s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes outlinePanelSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes outlinePanelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.outline-panel-header {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: var(--titlebar-height);
+  padding: 0 6px 0 var(--space-2);
+
+  /* 视觉 */
+  background-color: var(--sidebar);
+  border-bottom: 1px solid var(--sidebar-border);
+
+  /* 交互 */
+  user-select: none;
+}
+
+.outline-panel-title {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+
+  /* 视觉 */
+  color: var(--muted-foreground);
+}
+
+.outline-panel-title-icon {
+  width: var(--directory-tree-icon-size-md);
+  height: var(--directory-tree-icon-size-md);
+}
+
+.outline-panel-close-btn {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  padding: var(--btn-icon-padding);
+  border: none;
+  border-radius: 50%;
+
+  /* 视觉 */
+  background-color: transparent;
+  color: var(--titlebar-text-secondary);
+
+  /* 交互 */
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
+.outline-panel-close-btn:hover {
+  background-color: color-mix(in oklch, var(--muted-foreground) 15%, transparent);
+  color: var(--titlebar-text-primary);
+}
+
+.outline-panel-body {
+  /* 布局 */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.outline-panel-float .resize-handle {
+  /* 布局 */
+  position: absolute;
+  left: 0;
+  right: auto;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  z-index: 10;
+
+  /* 视觉 */
+  background-color: transparent !important;
+
+  /* 交互 */
+  cursor: col-resize;
+}
+
+/* 文本大纲浮层的正文避让：把编辑内容推到面板左侧换行，滚动条仍固定在容器最右缘。
+   --outline-gutter 由 OutlinePanel 依面板实测宽度写入 .editor-container；
+   min(..., 65%) 兜底，避免窗口过窄时内边距吃掉全部内容宽度。 */
+.editor-container .prosemirror-editor-container,
+.editor-container .markdown-editor .source-code-editor .cm-content {
+  padding-right: min(var(--outline-gutter, 0px), 65%);
+  transition: padding 0.2s ease;
+}
+
+/* 拖拽改宽时实时跟随，禁用过渡避免内边距滞后 */
+body.is-resizing .editor-container .prosemirror-editor-container,
+body.is-resizing .editor-container .markdown-editor .source-code-editor .cm-content {
+  transition: none;
+}
+
+/* ============================================
+   空状态样式
+   ============================================ */
+
+.empty-state {
+  /* 布局 */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+
+  /* 盒模型 */
+  flex: 1;
+  gap: 0;
+
+  /* 视觉 */
+  color: var(--app-text-quaternary);
+}
+
+/* 空状态分隔线 */
+.empty-state::before {
+  /* 布局 */
+  content: '';
+  position: absolute;
+  left: var(--app-empty-state-divider-position);
+  top: 10%;
+
+  /* 盒模型 */
+  height: 80%;
+  width: 1px;
+
+  /* 视觉 */
+  background: linear-gradient(to bottom, transparent, var(--app-border-primary), transparent);
+  opacity: 0.5;
+}
+
+/* 无分隔线模式 */
+.empty-state-no-divider::before {
+  display: none;
+}
+
+/* 空状态左侧区域 */
+.empty-state-left {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  flex: 0 0 var(--app-empty-state-divider-position);
+  gap: var(--app-empty-state-gap-md);
+}
+
+/* 空状态右侧区域 */
+.empty-state-right {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  /* 盒模型 */
+  flex: 0 0 61.8%;
+  padding-left: var(--app-empty-state-padding-left);
+  gap: var(--app-empty-state-gap-lg);
+}
+
+/* 空状态区块 */
+.empty-state-section {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* 空状态标题 */
+.empty-state-title {
+  /* 排版 */
+  font-size: var(--font-size-empty-title);
+  font-weight: var(--font-weight-semibold);
+  color: var(--app-text-secondary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--app-empty-state-gap-md) 0;
+
+  /* 交互 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* 空状态段落 */
+.empty-state p {
+  /* 排版 */
+  font-size: var(--font-size-empty-text);
+  color: var(--app-text-secondary);
+}
+
+/* 空状态图标 */
+.empty-state > svg {
+  /* 盒模型 */
+  width: var(--app-empty-state-icon-size);
+  height: var(--app-empty-state-icon-size);
+
+  /* 视觉 */
+  opacity: 0.3;
+}
+
+/* 空状态设置按钮 */
+.empty-state-settings {
+  /* 布局 */
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  z-index: 10;
+}
+
+/* ============================================
+   空状态按钮组
+   ============================================ */
+
+.empty-state-buttons {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  /* 盒模型 */
+  gap: var(--app-empty-state-gap-sm);
+}
+
+/* 空状态链接按钮 */
+.empty-state-link {
+  /* 布局 */
+  display: inline-flex;
+  align-items: center;
+
+  /* 盒模型 */
+  padding: 6px 0;
+  border: none;
+
+  /* 视觉 */
+  background-color: transparent;
+  color: var(--app-text-secondary);
+
+  /* 排版 */
+  font-size: var(--font-size-empty-link);
+  text-align: left;
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.empty-state-link svg {
+  /* 盒模型 */
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.empty-state-link:hover {
+  color: var(--app-text-primary);
+}
+
+.empty-state-link:active {
+  color: var(--app-text-primary);
+}
+
+/* ============================================
+   最近文件区域
+   ============================================ */
+
+.empty-state-recent {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  /* 盒模型 */
+  gap: var(--app-empty-state-gap-sm);
+}
+
+/* 最近文件夹图标 */
+.recent-folder-icon {
+  /* 盒模型 */
+  width: var(--app-recent-folder-icon-size) !important;
+  height: var(--app-recent-folder-icon-size) !important;
+
+  /* 排版 */
+  font-size: var(--app-recent-folder-icon-size);
+}
+
+/* ============================================
+   打开文件夹按钮
+   ============================================ */
+
+.open-folder-btn {
+  /* 盒模型 */
+  padding: 10px 24px;
+  border: none;
+  border-radius: var(--app-radius-md);
+
+  /* 视觉 */
+  background-color: var(--app-text-secondary);
+  color: var(--app-bg-primary);
+
+  /* 排版 */
+  font-size: var(--font-size-empty-link);
+  font-weight: var(--font-weight-medium);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.open-folder-btn:hover {
+  background-color: var(--app-text-primary);
+}
+
+/* ============================================
+   移动端布局样式
+   ============================================ */
+
+/* 移动端遮罩层 */
+.mobile-sidebar-overlay {
+  /* 布局 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+
+  /* 视觉 */
+  background-color: rgba(0, 0, 0, 0.5);
+
+  /* 交互 */
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   编辑器工具栏
+   参考飞书文档风格 — 居中、与正文对齐、干净简洁
+   ============================================ */
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 24px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+  border-bottom: 1px solid var(--border);
+  opacity: 1;
+  /* 折叠项（@rc-component/overflow）为 position:absolute，需要定位上下文 */
+  position: relative;
+  /* 边框颜色跟随全局主题过渡，避免与内容区不同步 */
+  transition: height 0.3s ease,
+              opacity 0.3s ease,
+              border-bottom-width 0.3s ease,
+              border-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.editor-toolbar.toolbar-hidden {
+  height: 0;
+  opacity: 0;
+  border-bottom-width: 0;
+  pointer-events: none;
+}
+
+.editor-toolbar-editor {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* @rc-component/overflow 条目外壳（隐藏项由库设为 position:absolute） */
+.editor-toolbar-editor .rc-overflow-item {
+  display: flex;
+  align-items: center;
+}
+
+.editor-toolbar-app {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+
+.editor-toolbar.menu-open {
+  overflow: visible;
+}
+
+.editor-toolbar-separator {
+  width: 1px;
+  height: 18px;
+  margin: 0 7px;
+  background-color: var(--border);
+  flex-shrink: 0;
+}
+
+.editor-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 9999px;
+  background-color: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  /* 颜色跟随全局主题过渡，避免与内容区不同步 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+  flex-shrink: 0;
+}
+
+.editor-toolbar-btn:hover {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+.editor-toolbar-btn:active {
+  background-color: color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.editor-toolbar-btn.active {
+  background-color: var(--accent);
+  color: var(--foreground);
+}
+
+.editor-toolbar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.editor-toolbar-menu-wrap {
+  position: relative;
+}
+
+.editor-toolbar-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 100;
+  min-width: 160px;
+  padding: 4px;
+  border-radius: 8px;
+  background-color: var(--popover);
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  overflow-y: auto;
+  max-height: 380px;
+}
+
+.editor-toolbar-more-dropdown {
+  min-width: 160px;
+}
+
+.editor-toolbar-overflow-divider {
+  height: 1px;
+  margin: 4px 8px;
+  background-color: color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+.editor-toolbar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--popover-foreground);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  /* 颜色跟随全局主题过渡，避免与内容区不同步 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.editor-toolbar-dropdown-item:hover {
+  background-color: var(--muted);
+}
+
+.editor-toolbar-dropdown-item:active {
+  background-color: color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.editor-toolbar-dropdown-item:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 标题下拉选择器容器 */
+.editor-toolbar-heading-wrap {
+  display: flex;
+  align-items: center;
+  margin-right: 2px;
+  flex: 0 0 auto;
+}
+
+/* 悬浮/聚焦时与工具栏按钮一致的胶囊圆角（覆盖 shadcn 的 data-[size=sm] 圆角） */
+.editor-toolbar-heading-wrap [data-slot='select-trigger']:hover,
+.editor-toolbar-heading-wrap [data-slot='select-trigger']:focus-visible {
+  border-radius: 9999px;
+}
+
+/* 移动端侧边栏 */
+.sidebar-area.mobile {
+  /* 布局 */
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 101;
+
+  /* 盒模型 */
+  width: 250px;
+  max-width: 80vw;
+  height: 100vh;
+
+  /* 视觉 */
+  /* 直接使用 --background 确保与全局同步过渡 */
+  background-color: var(--background);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+
+  /* 交互 */
+  /* 背景跟随全局主题过渡，避免移动端侧边栏瞬时变色 */
+  transition: transform 0.3s ease,
+              background-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+/* 左侧移动端侧边栏 */
+.sidebar-area.mobile {
+  left: 0;
+  transform: translateX(0);
+}
+
+/* 移动端侧边栏折叠状态 */
+.sidebar-area.mobile.collapsed {
+  /* 布局 */
+  width: 250px !important;
+  min-width: 250px !important;
+  overflow: hidden;
+
+  /* 视觉 */
+  opacity: 1;
+
+  /* 交互 */
+  transform: translateX(-100%);
+}
+
+/* 移动端大纲视图模式 */
+.sidebar-area.mobile.outline-only {
+  min-width: 250px;
+}
+
+.sidebar-area.mobile.outline-only.collapsed {
+  /* 布局 */
+  width: 250px !important;
+  min-width: 250px !important;
+  overflow: hidden;
+
+  /* 视觉 */
+  opacity: 1;
+
+  /* 交互 */
+  transform: translateX(-100%);
+}
+
+/* 右侧移动端侧边栏 */
+.app:has(.sidebar-area.mobile[style*="right"]) .sidebar-area.mobile,
+.app:has(.sidebar-area.mobile[position="right"]) .sidebar-area.mobile {
+  right: 0;
+  left: auto;
+  transform: translateX(0);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.app:has(.sidebar-area.mobile[style*="right"]) .sidebar-area.mobile.collapsed,
+.app:has(.sidebar-area.mobile[position="right"]) .sidebar-area.mobile.collapsed {
+  transform: translateX(100%);
+}
+
+/* 移动端布局下的编辑器区域 */
+.mobile-layout .editor-area {
+  /* 确保编辑器区域在移动端侧边栏下方正常显示 */
+  width: 100%;
+}
+
+/* 移动端布局下的主内容区 */
+.mobile-layout .main-content {
+  /* 移动端不需要为侧边栏预留空间 */
+  position: relative;
+}
+
+/* 移动端空状态适配 */
+@media (max-width: 480px) {
+  .empty-state {
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .empty-state::before {
+    display: none;
+  }
+
+  .empty-state-right {
+    flex: 1;
+    padding-left: 0;
+    align-items: center;
+  }
+
+  .empty-state-section {
+    text-align: center;
+  }
+
+  .empty-state-buttons {
+    align-items: center;
+  }
+
+  .empty-state-settings {
+    left: auto;
+    right: 15px;
+  }
+}

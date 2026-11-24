@@ -1,0 +1,399 @@
+/**
+ * 编辑器相关组件样式
+ * 包含 ProseMirrorMarkdownEditor、ProseMirrorEditor、SourceCodeEditor
+ */
+
+
+
+/* ============================================
+   ProseMirror 基础样式
+   ============================================ */
+
+.ProseMirror {
+  max-width: var(--editor-max-width);
+  margin: 0 auto;
+  padding: var(--page-padding-y) var(--page-padding-x);
+  font-size: var(--font-size-editor);
+  line-height: var(--line-height-editor);
+  font-family: var(--editor-font-family-base);
+  min-height: 100%;
+  outline: none;
+  color: var(--editor-text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 编辑器初始化完成后才启用 padding 过渡，避免 Chromium 上 CSS 变量延迟解析触发的初始位移 */
+.ProseMirror.padding-ready {
+  transition: padding 0.2s ease;
+}
+
+/* 可读行宽关闭时：IR 内容铺满编辑区宽度（覆盖主题自定义的 --editor-max-width） */
+.prosemirror-editor-container.full-width .ProseMirror {
+  max-width: none;
+  margin: 0;
+}
+
+.ProseMirror-focused {
+  outline: none;
+}
+
+.ProseMirror-cursor {
+  border-left: 2px solid;
+  margin-left: -1px;
+}
+
+.ProseMirror-selectednode {
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.ProseMirror-selectednode:after {
+  border: none !important;
+}
+
+/* 原子块（水平线等）被 NodeSelection 选中时的可见反馈。
+ * 放在本文件而非编辑器内部 chrome：本文件始终随应用加载，且选择器不依赖
+ * `.texto-editor` 作用域，因此主窗口与 `/texto-editor` 演示路由都生效。
+ * 命中区由 `#writer hr` 的 padding 扩大（writer.css）。 */
+.ProseMirror hr.ProseMirror-selectednode {
+  background:
+    linear-gradient(
+      var(--editor-hr-selected-line, var(--primary, currentColor)),
+      var(--editor-hr-selected-line, var(--primary, currentColor))
+    ) center / 100% 1px no-repeat,
+    var(--editor-hr-selected-band, var(--default-selection, color-mix(in srgb, currentColor 15%, transparent))) !important;
+  background-clip: border-box !important;
+  border-radius: 4px;
+}
+
+.ProseMirror-placeholder {
+  color: var(--editor-text-secondary);
+  pointer-events: none;
+  position: absolute;
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection *::-moz-selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection {
+  caret-color: transparent;
+}
+
+/* ============================================
+   MarkdownEditor 组件样式
+   ============================================ */
+
+.markdown-editor {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.markdown-editor .prosemirror-editor-container {
+  flex: 1;
+  overflow: auto;
+}
+
+/* ============================================
+   编辑模式切换（IR ⇄ 源码）：平移（轮播）转场
+   ============================================
+   两个编辑器常驻挂载，稳态靠 display 切换（零成本）；只有过渡相位
+   （data-pane-transition="warm" | "run"）才让两层同时参与布局并叠放。
+   IR 与 SV 是同一条水平长带的左右两半，整条带整体平移一个屏宽，两页
+   始终全不透明 —— 不做淡入淡出，否则会被看成"叠放交叉淡化"而非"平移"。
+   相位由 usePaneTransition 驱动。详见
+   docs/superpowers/specs/2026-10-15-ir-sv-transition-design.md */
+
+.editor-panes {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  /* 裁掉平移出去的整层，否则横向溢出 / 出滚动条。
+     用 clip 而非 hidden：hidden 仍是可滚动容器，过渡期间屏外那层被
+     focus() / scrollIntoView 带进视野时会把整个容器横向滚走 —— 看起来就是抖动。 */
+  overflow: clip;
+  /* 位移量；RTL 下镜像（transform 是物理方向，不会自动翻转） */
+  --pane-off: 100%;
+}
+
+.markdown-editor.editor-content-rtl .editor-panes {
+  --pane-off: -100%;
+}
+
+/* 稳态：非活动 pane 不参与布局。这是今天的成本基线，不要改成常驻布局 */
+.editor-pane {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.editor-pane[data-active='true'] {
+  display: flex;
+}
+
+/* 过渡相位：两层同时参与布局并叠放在同一位置 */
+.markdown-editor[data-pane-transition='warm'] .editor-pane,
+.markdown-editor[data-pane-transition='run'] .editor-pane {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  /* WKWebView 需要它才稳定提升为合成层 */
+  backface-visibility: hidden;
+}
+
+.markdown-editor[data-pane-transition='warm'] .editor-pane {
+  transition: none;
+}
+
+.markdown-editor[data-pane-transition='run'] .editor-pane {
+  transition: transform 340ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* 起止位置由 data-pane + data-active 派生，不额外存状态。
+   只在过渡相位生效：transform 常驻会额外建立 fixed 包含块与层叠上下文。 */
+.markdown-editor[data-pane-transition] .editor-pane[data-pane='ir'][data-active='true'],
+.markdown-editor[data-pane-transition] .editor-pane[data-pane='sv'][data-active='true'] {
+  transform: translate3d(0, 0, 0);
+}
+
+/* 屏外那半仍然全不透明：它是长带的另一半，平移时边对边贴合，不做淡化 */
+.markdown-editor[data-pane-transition] .editor-pane[data-pane='ir'][data-active='false'] {
+  transform: translate3d(calc(var(--pane-off) * -1), 0, 0);
+}
+
+.markdown-editor[data-pane-transition] .editor-pane[data-pane='sv'][data-active='false'] {
+  transform: translate3d(var(--pane-off), 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markdown-editor[data-pane-transition='run'] .editor-pane {
+    transition: none;
+  }
+}
+
+/* ============================================
+   ProseMirrorEditor 组件样式
+   ============================================ */
+
+.prosemirror-editor-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* 文档末尾留白与 Typora 对齐（约 100px）：文末光标行也能离开底边，
+   配合 editor-api 的 scrollMargin/scrollThreshold = 140px。
+   只作用于主窗口编辑器：导出/打印的克隆体不在 .editor-container 内，
+   因此不会被带进 HTML/EPUB/PDF 的末尾留白。 */
+.editor-container .prosemirror-editor-container .ProseMirror {
+  padding-bottom: max(var(--page-padding-y), 100px);
+}
+
+/* ============================================
+   SourceCodeEditor 组件样式
+   ============================================ */
+
+.source-code-editor {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.source-code-editor .cm-editor {
+  width: 100%;
+  height: 100%;
+}
+
+.source-code-editor .cm-scroller {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-editor-source);
+  line-height: 1.65;
+}
+
+.source-code-editor .cm-content {
+  min-height: 100%;
+  padding: var(--page-padding-y) 8px var(--page-padding-y) 0;
+  transition: padding 0.2s ease;
+  margin: 0;
+}
+
+/* 源码编辑器行高 - 参考 VS Code 默认行高 */
+.source-code-editor .cm-line {
+  line-height: 1.5;
+}
+
+/* ============================================
+   源码编辑器统一使用编辑器主题背景色
+   背景由父容器 .editor-area 统一持有，这里置为透明，
+   避免代码块主题的背景色透出，也避免各层各自渐变造成不同步
+   ============================================ */
+
+.markdown-editor .source-code-editor[class*="code-theme-"],
+.markdown-editor .source-code-editor[class*="code-theme-"].source-code-editor {
+  background-color: transparent !important;
+}
+
+.markdown-editor .source-code-editor[class*="code-theme-"] .cm-editor,
+.markdown-editor .source-code-editor[class*="code-theme-"].source-code-editor .cm-editor {
+  background-color: transparent !important;
+}
+
+.markdown-editor .source-code-editor[class*="code-theme-"] .cm-scroller,
+.markdown-editor .source-code-editor[class*="code-theme-"].source-code-editor .cm-scroller {
+  background-color: transparent !important;
+}
+
+.markdown-editor .source-code-editor[class*="code-theme-"] .cm-content,
+.markdown-editor .source-code-editor[class*="code-theme-"].source-code-editor .cm-content {
+  background-color: transparent !important;
+}
+
+/* 源码编辑器基础文字颜色（CM 主题未指定时作为回退） */
+.source-code-editor .cm-editor {
+  color: var(--editor-text-primary);
+}
+
+/* 光标颜色跟随主题色 */
+.source-code-editor .cm-editor .cm-cursor {
+  border-left-color: var(--foreground) !important;
+}
+
+
+
+.source-code-editor .cm-gutters {
+  background-color: transparent !important;
+  border-right: none !important;
+}
+
+/* 源码模式行号样式 */
+.source-code-editor .cm-lineNumbers {
+  font-family: var(--font-family-mono);
+  font-size: calc(var(--font-size-editor-source) * 0.85);
+  color: var(--editor-text-secondary);
+  opacity: 0.6;
+  padding-right: 8px;
+  min-width: 2.5em;
+}
+
+.source-code-editor .cm-lineNumbers .cm-gutterElement {
+  padding: 0 4px;
+  text-align: right;
+}
+
+/* 源码模式下选中文本的样式 */
+.source-code-editor .cm-content ::selection {
+  background-color: rgba(100, 149, 237, 0.4) !important;
+  color: inherit !important;
+}
+
+.source-code-editor .cm-content ::-moz-selection {
+  background-color: rgba(100, 149, 237, 0.4) !important;
+  color: inherit !important;
+}
+
+/* 源码模式搜索匹配高亮（VS Code 风格） */
+.source-code-editor .cm-search-match {
+  background-color: var(--search-match-bg);
+  border-radius: 2px;
+}
+
+.source-code-editor .cm-search-match-current {
+  background-color: var(--search-match-current-bg);
+  box-shadow: 0 0 0 1px var(--search-match-current-border);
+}
+
+/* ============================================
+   当前行高亮（类似 VS Code）
+   ============================================ */
+
+.source-code-editor .cm-activeLine {
+  background-color: color-mix(in oklch, var(--muted) 50%, transparent);
+}
+
+
+
+/* ============================================
+   源码模式代码折叠样式
+   ============================================ */
+
+/* 折叠边栏容器 */
+.source-code-editor .cm-foldGutter {
+  width: 20px;
+  background-color: transparent;
+  /* border-right: 1px solid var(--border); */
+}
+
+.source-code-editor .cm-foldGutter .cm-gutterElement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 暗色模式下降低分割线明显度 */
+/* .dark .source-code-editor .cm-foldGutter {
+  border-right-color: color-mix(in oklch, var(--border) 50%, transparent);
+} */
+
+.source-code-editor .cm-foldGutter .cm-fold-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  opacity: 0 !important;
+  color: var(--editor-text-secondary);
+  transition: opacity 0.4s ease !important;
+}
+
+.source-code-editor .cm-foldGutter.gutter-hovered .cm-fold-marker {
+  opacity: 0.9 !important;
+  color: var(--editor-text-primary);
+}
+
+.source-code-editor .cm-foldGutter .cm-fold-marker:hover {
+  opacity: 1 !important;
+}
+
+/* SVG 箭头样式 */
+.source-code-editor .cm-foldGutter .cm-fold-marker svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* 折叠后的占位符样式 */
+.source-code-editor .cm-foldPlaceholder {
+  background-color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 6px;
+  margin: 0 2px;
+  font-size: 0.85em;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.source-code-editor .cm-foldPlaceholder:hover {
+  background-color: var(--accent);
+}
+
+/* 折叠范围样式 */
+.source-code-editor .cm-folded {
+  background-color: color-mix(in oklch, var(--muted) 30%, transparent);
+  border-radius: var(--radius-md);
+}

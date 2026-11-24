@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Textox</title>
+    <script>
+      // 仅浏览器/演示环境（非 Tauri）：首绘前设置背景色，避免深色模式加载期白屏。
+      // Tauri 桌面端由 Rust 窗口底色 + wry transparent 处理，无需此脚本。
+      // 只设置内联样式（无 !important、无 style 标签），主题应用后由 applyColorTheme 清空。
+      if (!('__TAURI_INTERNALS__' in window)) {
+        try {
+          var appearance = localStorage.getItem('texto-appearance') || 'system';
+          var isDark = appearance === 'dark' || (appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          // 各主题暗/亮背景色，与 themes/*.css 的 --background 保持一致
+          var themeBg = {
+            default: { dark: '#0d1117', light: '#ffffff' },
+            pastel: { dark: '#12080c', light: '#fff8f7' },
+            spring: { dark: '#192427', light: '#fefefe' }
+          };
+          var colorTheme = localStorage.getItem('texto-color-theme') || 'default';
+          var bg = (themeBg[colorTheme] || themeBg.default)[isDark ? 'dark' : 'light'];
+          document.documentElement.style.backgroundColor = bg;
+          document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+        } catch (e) {}
+      }
+    </script>
+    <!-- MathJax 由 @texto/markdown-editor-runtime 在首次渲染公式时按需注入，
+         避免打开任意窗口都解析 2MB 脚本、与文档首帧争抢主线程。 -->
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

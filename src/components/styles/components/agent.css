@@ -1,0 +1,486 @@
+/* Agent 结果视图（悬浮块 / 侧栏 AI tab） */
+
+.agent-presenter-root {
+  position: fixed;
+  z-index: 60;
+}
+
+.agent-result {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgb(0 0 0 / 16%));
+  overflow: hidden;
+}
+
+.agent-result-sidebar {
+  max-height: none;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--sidebar-foreground);
+}
+
+/* 与文件树 / 大纲侧栏对齐：容器与项的内缩之和，上下 padding 由各区块自身决定。 */
+.agent-result-sidebar .agent-result-header,
+.agent-result-sidebar .agent-result-body,
+.agent-result-sidebar .agent-result-error,
+.agent-result-sidebar .agent-result-source {
+  padding-left: calc(
+    var(--directory-tree-content-padding-x) + var(--directory-tree-item-padding-x)
+  );
+  padding-right: calc(
+    var(--directory-tree-content-padding-x) + var(--directory-tree-item-padding-x)
+  );
+}
+
+/* 常驻状态行：只承载加载声波；预留与声波同高，加载结束后正文不向上跳 */
+.agent-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 28px;
+  padding: 8px 12px 4px;
+}
+
+.agent-result-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.agent-result-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+
+.agent-result-actions button:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.agent-result-actions button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* 正文与顶部渐隐的定位容器：渐隐层覆盖在正文上、不随内容滚动 */
+.agent-result-body-area {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.agent-result-body {
+  overflow: auto;
+  /* 底部留出胶囊操作栏的高度，正文静止时不会压在按钮下 */
+  padding: 10px 12px 72px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* 悬浮卡没有状态行：首行减掉行高留白，让文字到顶边与左右的视觉间距一致 */
+.agent-result-floating .agent-result-body {
+  padding-top: 10px;
+}
+
+/* 最后一段不带尾部外边距，否则底部留白会比顶部/左右更宽 */
+.agent-result-body :is(p, ul, ol, blockquote, pre, table, h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+}
+
+.agent-result-body :is(p, ul, ol, blockquote, pre, table, h1, h2, h3, h4, h5, h6):last-child {
+  margin-bottom: 0;
+}
+
+.agent-result-placeholder {
+  color: var(--muted-foreground);
+}
+
+.agent-result-error {
+  padding: 10px 12px 72px;
+  color: var(--destructive);
+  font-size: 13px;
+}
+
+/* 结果正文的 Markdown 排版（只作用于 Agent 卡片，避免污染全局） */.agent-result-body p,
+.agent-result-body ul,
+.agent-result-body ol,
+.agent-result-body blockquote,
+.agent-result-body pre,
+.agent-result-body table {
+  margin: 0 0 0.7em;
+}
+
+.agent-result-body ul,
+.agent-result-body ol {
+  padding-left: 1.4em;
+}
+
+.agent-result-body h1,
+.agent-result-body h2,
+.agent-result-body h3,
+.agent-result-body h4,
+.agent-result-body h5,
+.agent-result-body h6 {
+  margin: 0.9em 0 0.45em;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.agent-result-body h1 { font-size: 1.35em; }
+.agent-result-body h2 { font-size: 1.2em; }
+.agent-result-body h3,
+.agent-result-body h4 { font-size: 1.05em; }
+.agent-result-body h5 { font-size: 0.95em; }
+.agent-result-body h6 { font-size: 0.9em; }
+
+.agent-result-body code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--muted);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.92em;
+}
+
+.agent-result-body pre {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--muted);
+  overflow: auto;
+}
+
+.agent-result-body pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.agent-result-body blockquote {
+  padding-left: 10px;
+  border-left: 3px solid var(--border);
+  color: var(--muted-foreground);
+}
+
+.agent-result-body a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.agent-result-body table {
+  border-collapse: collapse;
+}
+
+.agent-result-body th,
+.agent-result-body td {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+}
+
+/* 侧栏 AI tab 的内容视图：宽度由用户拖拽的侧栏决定，这里只约束高度与滚动 */
+.agent-sidebar-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.agent-sidebar-panel .agent-result {
+  flex: 1;
+  min-height: 0;
+}
+
+/* 底部工具条：常驻的滚动边缘效果——内容接近底边时逐渐淡出（参考 macOS 26） */
+.agent-result-footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 64px;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+/* 浮窗的胶囊更贴底；侧栏保持居中 */
+.agent-result-floating .agent-result-footer {
+  align-items: flex-end;
+  padding-bottom: 8px;
+}
+
+.agent-result-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklab, var(--popover) 55%, transparent) 38%,
+    var(--popover) 100%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+/* 正文延伸到工具条下方时才显示边缘渐隐 */
+.agent-result.has-scroll-underlap .agent-result-footer::before {
+  opacity: 1;
+}
+
+.agent-result-sidebar .agent-result-footer::before {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklab, var(--sidebar) 55%, transparent) 38%,
+    var(--sidebar) 100%
+  );
+}
+
+.agent-result-footer .agent-result-actions {
+  position: relative;
+  z-index: 1;
+  gap: 3px;
+  padding: 3px 5px;
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--popover) 82%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 35%),
+    0 6px 18px rgb(0 0 0 / 10%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  pointer-events: auto;
+}
+
+.agent-result-footer .agent-result-actions button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.agent-result-footer .agent-result-actions button svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+
+.agent-result-footer .agent-result-model-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.agent-result-footer .agent-result-model-toggle svg[data-provider='deepseek'] {
+  transform: scale(1.12);
+  transform-origin: center;
+}
+
+.agent-result-footer .agent-result-model-toggle svg[data-provider='custom'] {
+  width: 15px;
+  height: 15px;
+}
+
+.agent-model-menu {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 6px);
+  z-index: 2;
+  /* 工具条本身不拦截指针事件，菜单需要单独恢复 */
+  pointer-events: auto;
+  min-width: 180px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--popover);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgb(0 0 0 / 16%));
+}
+
+.agent-model-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--popover-foreground);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.agent-model-menu button:hover,
+.agent-model-menu button[aria-checked='true'] {
+  background: var(--muted);
+}
+
+.agent-model-menu-empty {
+  padding: 6px 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.agent-panel-loading {
+  min-height: 40px;
+  padding: 16px;
+}
+
+.agent-result-busy {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--muted-foreground);
+}
+
+.agent-result-busy-wave {
+  width: 16px;
+  height: 16px;
+  opacity: 1;
+}
+
+/* 加载态：同周期 + 相位差，波峰从左到右扫过 */
+.agent-result-busy .agent-result-busy-wave .model-settings-icon__bar {
+  animation-name: agent-loading-breathe;
+  animation-duration: 1.4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-fill-mode: backwards;
+}
+
+.agent-result-busy .agent-result-busy-wave .model-settings-icon__bar:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.agent-result-busy .agent-result-busy-wave .model-settings-icon__bar:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.agent-result-busy .agent-result-busy-wave .model-settings-icon__bar:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.agent-result-busy .agent-result-busy-wave .model-settings-icon__bar:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+.agent-result-busy .agent-result-busy-wave .model-settings-icon__bar:nth-child(5) {
+  animation-delay: 0.48s;
+}
+
+@keyframes agent-loading-breathe {
+  0%, 100% { transform: scaleY(0.45); opacity: 0.3; }
+  50% { transform: scaleY(1.35); opacity: 1; }
+}
+
+.agent-result-source {
+  max-height: 120px;
+  margin: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  border-left: 2px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow: auto;
+}
+
+.agent-result-source-panel {
+  position: absolute;
+  right: 8px;
+  /* 让出底部胶囊（10 + 36）再留一点间隙 */
+  bottom: 52px;
+  left: 8px;
+  z-index: 2;
+  max-height: min(45vh, 240px);
+  overflow: auto;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--popover);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgb(0 0 0 / 16%));
+  animation: agent-source-in 160ms ease;
+}
+
+.agent-result-source-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.agent-result-source-panel-header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+
+.agent-result-source-panel-header button:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.agent-result-source-panel .agent-result-source {
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow: visible;
+}
+
+@keyframes agent-source-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-result-source-panel {
+    animation: none;
+  }
+}

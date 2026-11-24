@@ -1,0 +1,12 @@
+[submodule "vendor/excalidraw"]
+	path = vendor/excalidraw
+	url = https://github.com/textoxmd/excalidraw.git
+[submodule "vendor/translations"]
+	path = vendor/translations
+	url = https://github.com/textoxmd/translations.git
+[submodule "vendor/plugin-sdk"]
+	path = vendor/plugin-sdk
+	url = https://github.com/textoxmd/plugin-sdk.git
+[submodule "vendor/plugins/mkdext"]
+	path = vendor/plugins/mkdext
+	url = https://github.com/textoxmd/textox-plugin-mkdext.git

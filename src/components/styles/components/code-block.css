@@ -1,0 +1,314 @@
+/**
+ * 代码块样式
+ * 支持通过 CSS 类名切换主题，无需重新渲染编辑器
+ * 亮暗主题分离，通过 .dark 类名自动切换
+ */
+
+/* ============================================
+   基础变量定义（亮色默认）
+   ============================================ */
+
+:root {
+  /* 代码块基础变量（浅色） */
+  --code-block-bg: oklch(0.97 0 0);
+  --code-block-border: oklch(0.88 0 0);
+  --code-block-button-bg: oklch(1 0 0 / 0.95);
+  --code-block-button-color: var(--foreground);
+  --code-block-button-border: oklch(0.88 0 0);
+  --code-block-button-hover-bg: oklch(0.96 0 0);
+  --code-block-inline-hover-bg: oklch(0 0 0 / 0.05);
+  --code-block-selection-bg: oklch(0.6 0.15 260 / 0.35);
+}
+
+.dark {
+  /* 代码块基础变量（深色） */
+  --code-block-bg: oklch(0.25 0.015 252.3);
+  --code-block-border: var(--border);
+  --code-block-button-bg: oklch(0.3 0.015 256.8 / 0.95);
+  --code-block-button-color: var(--foreground);
+  --code-block-button-border: oklch(0.4 0.015 252.3);
+  --code-block-button-hover-bg: oklch(0.35 0.015 256.8);
+  --code-block-inline-hover-bg: oklch(1 1 1 / 0.08);
+  --code-block-selection-bg: oklch(0.65 0.18 260 / 0.45);
+}
+
+/* ============================================
+   代码块容器基础样式
+   ============================================ */
+
+.code-block-wrapper {
+  margin: 0 0 1em 0;
+  border-radius: 8px;
+  overflow: visible;
+  background: var(--code-block-bg);
+  border: 1px solid var(--code-block-border);
+  position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* 渲染模式下的代码块 */
+.code-block-wrapper.mermaid-render-mode,
+.code-block-wrapper.math-render-mode {
+  background: transparent;
+  border: none;
+}
+
+/* ============================================
+    CodeMirror 容器
+    ============================================ */
+
+.cm-container {
+  position: relative;
+}
+
+.cm-container .cm-editor {
+  background: transparent;
+}
+
+.cm-container .cm-content {
+  background: transparent !important;
+}
+
+/* ============================================
+   渲染容器（统一 mermaid/math）
+   ============================================ */
+
+.cb-render-container {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.ProseMirror[contenteditable="false"] .cb-render-container {
+  cursor: default;
+}
+
+.cb-render-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 渲染模式下代码块没有背景/边框 */
+/* 需要更高特异性以覆盖 highlight-theme.ts 注入的 .ProseMirror pre { background !important } */
+.ProseMirror pre.cb-render-mode {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 渲染模式下隐藏语言选择框 */
+.cb-render-mode .cb-chrome {
+  display: none !important;
+}
+
+.cb-error-mode {
+  border: 2px solid var(--destructive) !important;
+  border-radius: 8px !important;
+  background: color-mix(in oklch, var(--destructive) 12%, transparent) !important;
+}
+
+.cb-render-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+.cb-render-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.cb-render-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  font-size: 13px;
+}
+
+.cb-error-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--destructive);
+  color: oklch(1 0 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.cb-error-msg {
+  color: color-mix(in oklch, var(--destructive) 80%, var(--foreground));
+  flex: 1;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.cb-retry-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--destructive);
+  background: var(--background);
+  color: var(--destructive);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.cb-retry-btn:hover {
+  background: var(--destructive);
+  color: oklch(1 0 0);
+}
+
+.mermaid-svg-container {
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  padding: 12px 0;
+  max-height: 600px;
+  width: 100%;
+}
+
+.math-svg-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.math-svg-container svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ============================================
+   Mermaid 渲染容器
+   ============================================ */
+
+.mermaid-render-container {
+  padding: 16px;
+  max-height: 600px;
+  overflow: auto;
+  cursor: pointer;
+  background: var(--code-block-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.mermaid-action-buttons {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.mermaid-action-buttons.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mermaid-action-button {
+  background: var(--code-block-button-bg);
+  border: 1px solid var(--code-block-button-border);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--code-block-button-color);
+  transition: all 0.2s ease;
+  height: 28px;
+  width: 28px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mermaid-action-button:hover {
+  background: var(--code-block-button-hover-bg);
+}
+
+.math-action-buttons {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+  pointer-events: none;
+  background: var(--code-block-button-bg);
+  border: 1px solid var(--code-block-button-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.math-action-buttons.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ============================================
+   行内数学公式
+   ============================================ */
+
+.math-inline-wrapper {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.math-inline-editor {
+  display: inline;
+  background: var(--code-block-inline-hover-bg);
+  border-radius: 3px;
+  padding: 0 2px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 14px;
+}
+
+.math-inline-delimiter {
+  color: var(--muted-foreground);
+  user-select: none;
+  margin: 0 2px;
+}
+
+.math-inline-content {
+  outline: none;
+  white-space: nowrap;
+  cursor: text;
+}
+
+.math-inline-render {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}

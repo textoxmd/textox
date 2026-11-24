@@ -1,0 +1,5 @@
+# Bun 默认在含 workspaces 的项目里改用 isolated linker，会让仓库既有的
+# 幻影依赖（如 @radix-ui/react-dialog、@codemirror/commands）不再提升到顶层，
+# 导致 tsc/vite 解析失败。这里显式沿用本仓库一直使用的 hoisted 布局。
+[install]
+linker = "hoisted"

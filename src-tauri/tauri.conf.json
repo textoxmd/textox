@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Textox",
+  "version": "2.4.2",
+  "identifier": "com.texto.markdown",
+  "build": {
+    "beforeDevCommand": "bun run scripts/build/frontend.mjs dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "bun run scripts/build/frontend.mjs build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": [
+            "$TEMP/textox/**"
+          ],
+          "deny": [],
+          "requireLiteralLeadingDot": false
+        }
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "吱吱狼",
+    "resources": {
+      "resources/plugins": "plugins"
+    },
+    "icon": [
+      "icons/128x128@2x.png",
+      "icons/128x128.png",
+      "icons/32x32.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "wix": {
+        "language": "zh-CN",
+        "template": null,
+        "componentGroupRefs": [],
+        "featureRefs": []
+      }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13",
+      "infoPlist": "Info.plist",
+      "entitlements": "./entitlements.plist",
+      "files": {
+        "Resources/Assets.car": "icons/Assets.car"
+      }
+    },
+    "fileAssociations": [
+      {
+        "ext": [
+          "md",
+          "markdown",
+          "mdown",
+          "mkd"
+        ],
+        "mimeType": "text/markdown",
+        "description": "Markdown document",
+        "role": "Editor"
+      }
+    ]
+  }
+}

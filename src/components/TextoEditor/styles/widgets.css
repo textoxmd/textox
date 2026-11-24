@@ -1,0 +1,402 @@
+/*
+ * Editor chrome — adapted for Textox theme system.
+ * Scoped under .texto-editor to avoid conflicts.
+ */
+
+/* ─── createEditor() scaffold ──────────────────────────── */
+.texto-editor .texto-web-wrap { display: block; }
+.texto-editor .texto-web-editor-host { display: block; }
+.texto-editor .texto-web-source {
+  display: block;
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  font: var(--font-size-base)/var(--line-height-editor) var(--font-family-mono);
+  background: transparent;
+  color: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 2;
+  box-sizing: border-box;
+  padding: 0;
+}
+.texto-editor .texto-web-source[hidden] { display: none; }
+
+/* ─── PM root reset ──────────────────────────────────────── */
+/* Override Textox's global .ProseMirror flex layout which breaks
+   texto-web's block-based rendering. Padding/max-width come
+   from Textox's global .ProseMirror rule (editor.css). */
+.texto-editor .ProseMirror {
+  outline: none;
+  min-height: 168px;
+  display: block;
+  flex: none;
+  gap: normal;
+  color: var(--editor-text-primary, var(--foreground));
+  caret-color: var(--foreground);
+}
+
+.win32 .texto-editor .ProseMirror {
+  cursor: var(--cursor-ibeam, text);
+}
+.texto-editor .ProseMirror[contenteditable="true"]:focus { outline: none; }
+
+/* ─── Typewriter mode ───────────────────────────────────── */
+/* 打字机模式会程序化控制滚动位置（含留白收起动画），
+   禁用浏览器 scroll anchoring，避免它与我们的 scrollTop 补偿叠加导致跳变 */
+.texto-editor {
+  overflow-anchor: none;
+}
+
+.texto-editor .ProseMirror.tw-pad {
+  min-height: 100vh;
+}
+
+.texto-editor .ProseMirror.tw-pad::before,
+.texto-editor .ProseMirror.tw-pad::after {
+  content: "";
+  display: block;
+  pointer-events: none;
+}
+.texto-editor .ProseMirror.tw-pad::before { height: var(--tw-pad-top, 45vh); }
+.texto-editor .ProseMirror.tw-pad::after { height: var(--tw-pad-bottom, 55vh); }
+/* WebKit（WKWebView）不会为空 textblock 里的 trailing <br> 绘制插入点：
+ * 按 Enter 新建空段落 / 空标题 / 空表格单元格后光标消失，直到下一次输入才出现。
+ * 补一个零宽空格，让插入点有可锚定的文本节点。
+ * 覆盖 p / h1-h6 / td / th（ProseMirror 对所有空 textblock 都会加 trailing break），
+ * 不删 <br> 本身：它负责撑出行盒。 */
+.texto-editor .ProseMirror :is(p, h1, h2, h3, h4, h5, h6, td, th):empty::before,
+.texto-editor .ProseMirror :is(p, h1, h2, h3, h4, h5, h6, td, th):has(> br.ProseMirror-trailingBreak:only-child)::before {
+  content: "\200B";
+  display: inline;
+}
+.texto-editor .ProseMirror.tw-pad > p {
+  min-height: 1.5em;
+}
+
+/* ─── method-B syntax hints ──────────────────────────────── */
+.texto-editor .ProseMirror .syntax-hint {
+  color: var(--muted-foreground);
+  font-weight: normal;
+  font-style: normal;
+  user-select: none;
+}
+.texto-editor .ProseMirror .syntax-hint-italic {
+  color: var(--muted-foreground);
+  font-style: italic;
+  font-weight: normal;
+  user-select: none;
+}
+.texto-editor .ProseMirror .syntax-hidden { font-size: 0; }
+
+.texto-editor .ProseMirror mark-comment {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.texto-editor .ProseMirror .heading-draft-1,
+.texto-editor .ProseMirror .heading-draft-2,
+.texto-editor .ProseMirror .heading-draft-3,
+.texto-editor .ProseMirror .heading-draft-4,
+.texto-editor .ProseMirror .heading-draft-5,
+.texto-editor .ProseMirror .heading-draft-6 { font-weight: bold; }
+
+/* ─── play caret + selection marker ─────────────────────── */
+.texto-editor .ProseMirror .play-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  margin: 0 -1px;
+  background: var(--foreground);
+  vertical-align: text-bottom;
+  animation: texto-caret-blink 1s step-end infinite;
+  user-select: none;
+  pointer-events: none;
+}
+@keyframes texto-caret-blink { 50% { opacity: 0; } }
+
+/* Editable (IR): text cursor on links; pointer only when Cmd held */
+.ProseMirror a { cursor: text; }
+.ProseMirror.mod-active a { cursor: pointer; }
+.ProseMirror[contenteditable="false"] a { cursor: pointer; }
+.texto-editor .ProseMirror-focused .play-caret { display: none; }
+.texto-editor .ProseMirror .selection-marker {
+  color: var(--foreground);
+  font-weight: bold;
+  user-select: none;
+}
+.texto-editor .ProseMirror-focused .selection-marker { display: none; }
+
+/* ─── reference link def ─────────────────────────────────── */
+.texto-editor .ProseMirror ref-def {
+  display: block;
+  margin: 4px 0;
+  font: var(--font-size-code-small)/1.5 var(--font-family-mono);
+  color: var(--muted-foreground);
+}
+.texto-editor .ProseMirror ref-label,
+.texto-editor .ProseMirror ref-url,
+.texto-editor .ProseMirror ref-title {
+  display: inline-block;
+  min-width: 1em;
+}
+.texto-editor .ProseMirror ref-label::before { content: "[ "; color: var(--muted-foreground); user-select: none; }
+.texto-editor .ProseMirror ref-label::after  { content: " ]: "; color: var(--muted-foreground); user-select: none; }
+.texto-editor .ProseMirror ref-url { color: var(--primary); }
+.texto-editor .ProseMirror ref-url[data-placeholder]::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  font-style: italic;
+  text-decoration: underline;
+  user-select: none;
+}
+.texto-editor .ProseMirror ref-title { color: var(--muted-foreground); padding-left: 0.6em; }
+.texto-editor .ProseMirror ref-title::before { content: '" '; color: var(--muted-foreground); user-select: none; }
+.texto-editor .ProseMirror ref-title::after  { content: ' "'; color: var(--muted-foreground); user-select: none; }
+.texto-editor .ProseMirror ref-title[data-placeholder]::before {
+  content: '" ' attr(data-placeholder) ' "';
+  color: var(--muted-foreground);
+  font-style: italic;
+  user-select: none;
+}
+.texto-editor .ProseMirror ref-title[data-placeholder]::after { content: ""; }
+.texto-editor .ProseMirror ref-label > .ProseMirror-trailingBreak,
+.texto-editor .ProseMirror ref-url   > .ProseMirror-trailingBreak,
+.texto-editor .ProseMirror ref-title > .ProseMirror-trailingBreak { display: none; }
+
+.texto-editor .ProseMirror .file-input {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9em;
+  margin: 0 2px;
+  opacity: 0.6;
+}
+.texto-editor .ProseMirror .file-input:hover { opacity: 1; }
+.texto-editor .ProseMirror img.image-render {
+  display: block;
+  margin: 4px 0;
+}
+.texto-editor .ProseMirror img.image-render-inline {
+  display: inline-block;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+/* ─── Image uploading — blur + spinner ──────────────────────────── */
+.texto-editor .ProseMirror .image-uploading {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  pointer-events: none;
+  user-select: none;
+}
+.texto-editor .ProseMirror .image-uploading > img {
+  filter: blur(3px);
+  opacity: 0.7;
+}
+.texto-editor .ProseMirror .image-uploading .uploading-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.texto-editor .ProseMirror .image-uploading .uploading-spinner::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: upload-spin .6s linear infinite;
+}
+@keyframes upload-spin { to { transform: rotate(360deg); } }
+
+/* ─── Task-list checkbox ───────────────────────────────────── */
+.texto-editor .ProseMirror .checkbox-frame {
+  display: inline-block;
+  padding-right: 8px;
+  user-select: none;
+  margin-left: -1.4em;
+}
+.texto-editor .ProseMirror .checkbox {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  vertical-align: -0.18em;
+  border: 1.5px solid var(--muted-foreground);
+  border-radius: 3px;
+  background: var(--background);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  box-sizing: border-box;
+}
+.texto-editor .ProseMirror .checkbox[data-checked="1"] {
+  background: var(--foreground);
+  border-color: var(--foreground);
+}
+.texto-editor .ProseMirror .checkbox[data-checked="1"]::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  top: 9%;
+  width: 35%;
+  height: 70%;
+  border: solid var(--background);
+  border-width: 0 0.1em 0.1em 0;
+  transform: rotate(45deg);
+}
+
+/* ─── Fenced code NodeView ─────────────────────────────────── */
+.texto-editor .ProseMirror pre {
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+.texto-editor .ProseMirror pre .cb-chrome {
+  display: none;
+  position: absolute;
+  right: 0;
+  /* 下沉距离由 writer.css 的 --editor-pre-chrome-offset 统一提供，
+     代码块下方间距据此预留，避免选择器与下一个节点重叠。 */
+  bottom: calc(-1 * var(--editor-pre-chrome-offset, 35px));
+  user-select: none;
+  z-index: 10;
+}
+.texto-editor .ProseMirror pre.cb-active .cb-chrome { display: block; }
+.texto-editor .ProseMirror pre .cb-lang-input {
+  width: 130px;
+  padding: 4px 8px;
+  font: var(--font-size-code-small) var(--font-family-mono);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-base);
+  background: var(--cb-chrome-bg, var(--editor-code-bg, var(--muted)));
+  color: var(--foreground);
+  outline: none;
+  line-height: 1.5;
+}
+.texto-editor .ProseMirror pre .cb-lang-input:focus { background: var(--accent, var(--muted)); }
+.texto-editor .ProseMirror pre.cb-lang-focus .play-caret { display: none; }
+
+/* Language dropdown styles */
+.texto-editor .ProseMirror pre .cb-lang-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  width: 130px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--cb-chrome-bg, var(--editor-code-bg, var(--muted)));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-base);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.texto-editor .ProseMirror pre .cb-lang-item {
+  padding: 6px 10px;
+  font: var(--font-size-code-small) var(--font-family-mono);
+  color: var(--foreground);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 悬停/键盘高亮用中性半透明叠加：部分主题（如深色 default/spring）的
+   --accent 与 --muted 取值相同，直接用作背景会和下拉面板底色融在一起。 */
+.texto-editor .ProseMirror pre .cb-lang-item:hover {
+  background: rgba(127, 127, 127, 0.16);
+}
+
+.texto-editor .ProseMirror pre .cb-lang-item.selected {
+  background: rgba(127, 127, 127, 0.32);
+  box-shadow: inset 2px 0 0 var(--foreground);
+}
+
+.texto-editor .ProseMirror pre .cb-lang-no-result {
+  color: var(--muted-foreground);
+  cursor: default;
+}
+
+.texto-editor .ProseMirror pre .cb-lang-no-result:hover {
+  background: transparent;
+}
+
+/* ─── Floating toolbar chrome (body-mounted, shared) ──────── */
+/* Neutral chrome shared by body-mounted floating toolbars; the
+ * inline-format toolbar uses these, and the table plugin's toolbar
+ * targets `.floating-toolbar*` (its table-private rules ship in the
+ * plugin's table.css). */
+.floating-toolbar {
+  position: fixed;
+  display: none;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 5px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  font-family: var(--font-family-base);
+}
+/* 悬浮行内格式工具栏容器圆角更大（与 lib 版一致）。 */
+.fmt-toolbar {
+  border-radius: 999px;
+}
+.floating-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+.floating-toolbar-btn:hover { background: var(--muted); color: var(--foreground); }
+.floating-toolbar-btn.active { background: var(--accent); color: var(--foreground); }
+.floating-toolbar-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+.floating-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.floating-toolbar-actions:empty { display: none; }
+/* 悬浮行内格式工具栏的按钮为圆形，与表格工具栏区分。 */
+.fmt-toolbar .floating-toolbar-btn {
+  border-radius: 50%;
+}
+.floating-toolbar-sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+  margin: 2px 4px;
+}
+.floating-toolbar-spacer { flex: 1; min-width: 12px; }
+
+/* Confirm-link dialog animation */
+@keyframes link-dialog-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes link-dialog-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.link-dialog-overlay {
+  animation: link-dialog-fade-in 150ms ease-out;
+}
+
+.link-dialog-card {
+  animation: link-dialog-scale-in 200ms ease-out;
+}

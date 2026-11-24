@@ -1,0 +1,462 @@
+/**
+ * SearchPanel 组件样式
+ * 包含搜索面板、搜索输入框、替换操作、导航按钮等
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     基础颜色
+     ------------------------------------------ */
+  --search-text-primary: var(--foreground);
+  --search-text-secondary: var(--muted-foreground);
+  --search-text-tertiary: var(--muted-foreground);
+  --search-text-quaternary: color-mix(in oklch, var(--muted-foreground) 70%, transparent);
+  --search-bg-primary: var(--background);
+  --search-bg-secondary: var(--secondary);
+  --search-bg-tertiary: var(--muted);
+  --search-border-color: var(--border);
+  --search-accent-color: var(--primary);
+
+  /* ------------------------------------------
+     尺寸
+     ------------------------------------------ */
+  --search-base-unit: 1rem;
+  --search-panel-min-width: 400px;
+  --search-panel-max-width: 800px;
+  /* 搜索框专用高度：比全局小号输入框(24px)略高，保证点击与可读性 */
+  --search-input-height: 28px;
+  --search-btn-size: var(--btn-toolbar-size);
+  /* 输入框内切换按钮尺寸：参照 VS Code 查找控件的紧凑小按钮 */
+  --search-toggle-size: 18px;
+  --search-resize-handle-width: var(--space-1);
+
+  /* ------------------------------------------
+     间距
+     ------------------------------------------ */
+  --search-padding: var(--space-1);
+  --search-padding-left: var(--space-xs);
+  --search-gap: var(--space-1);
+  --search-gap-xs: var(--space-xs);
+
+  /* ------------------------------------------
+     圆角
+     ------------------------------------------ */
+  --search-panel-radius: var(--radius-base);
+  --search-input-radius: var(--input-radius);
+  --search-btn-radius: var(--btn-toolbar-radius);
+
+  /* ------------------------------------------
+     阴影
+     ------------------------------------------ */
+  --search-panel-shadow: var(--shadow-md), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent);
+
+  /* ------------------------------------------
+     状态
+     ------------------------------------------ */
+  --search-hover-opacity: 0.8;
+  --search-disabled-opacity: 0.4;
+
+  /* ------------------------------------------
+     文档内匹配高亮（VS Code 风格）
+     ------------------------------------------ */
+  --search-match-bg: rgba(255, 196, 0, 0.45);
+  --search-match-current-bg: rgba(255, 145, 0, 0.75);
+  --search-match-current-border: rgba(214, 110, 0, 0.9);
+}
+
+.dark {
+  --search-match-bg: rgba(255, 196, 0, 0.28);
+  --search-match-current-bg: rgba(255, 150, 0, 0.55);
+  --search-match-current-border: rgba(255, 190, 80, 0.9);
+}
+
+/* ============================================
+   搜索面板基础样式
+   ============================================ */
+
+.search-panel {
+  /* 定位 */
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 1000;
+
+  /* 盒模型 */
+  min-width: var(--search-panel-min-width);
+  max-width: var(--search-panel-max-width);
+  padding: var(--search-padding);
+  padding-left: var(--search-padding-left);
+
+  /* 视觉样式 */
+  background-color: var(--search-bg-secondary);
+  border: 0px solid var(--search-border-color);
+  border-radius: var(--search-panel-radius);
+  box-shadow: var(--search-panel-shadow);
+
+  /* 排版 */
+  font-family: var(--font-family-base);
+
+  /* 交互 */
+  animation: slide-in 0.15s ease-out;
+  user-select: none;
+}
+
+/* 滑入动画 */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   拖拽调整宽度条
+   ============================================ */
+
+.search-panel .resize-handle {
+  /* 定位 */
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  /* 盒模型 */
+  width: var(--search-resize-handle-width);
+
+  /* 交互 */
+  cursor: col-resize;
+  background: transparent;
+  border-radius: var(--search-panel-radius) 0 0 var(--search-panel-radius);
+  transition: background-color var(--transition-fast);
+}
+
+/* 默认显示一条细微竖线，与面板背景区分开 */
+.search-panel .resize-handle::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: var(--space-2);
+  bottom: var(--space-2);
+  width: 2px;
+  border-radius: 1px;
+  background-color: color-mix(in oklch, var(--foreground) 15%, transparent);
+}
+
+/* 悬浮/拖动时细线变为主题色，不再额外加粗 */
+.search-panel .resize-handle:hover::before {
+  background-color: color-mix(in oklch, var(--search-accent-color) 75%, transparent);
+}
+
+.search-panel .resize-handle:active::before {
+  background-color: var(--search-accent-color);
+}
+
+/* ============================================
+   搜索内容布局
+   ============================================ */
+
+.search-content {
+  /* 布局 */
+  display: flex;
+  align-items: stretch;
+  gap: var(--search-gap);
+}
+
+/* 切换单元格 */
+.toggle-cell {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  /* 盒模型 */
+  width: var(--btn-icon-size);
+}
+
+/* 搜索行容器 */
+.search-rows {
+  /* 布局 */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--search-gap);
+}
+
+/* 单行搜索 */
+.search-row {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: var(--search-gap);
+
+  /* 盒模型 */
+  height: var(--search-input-height);
+}
+
+/* 输入框包装器 */
+.input-wrapper {
+  /* 布局 */
+  flex: 1;
+  min-width: 0;
+}
+
+/* 输入框容器 */
+.input-container {
+  /* 布局 */
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  /* 盒模型 */
+  width: 100%;
+}
+
+/* ============================================
+   搜索输入框
+   ============================================ */
+
+.search-input {
+  /* 盒模型 */
+  width: 100%;
+  height: var(--search-input-height);
+  padding: var(--space-1) calc(var(--search-toggle-size) * 3 + var(--space-2)) var(--space-1) var(--input-padding-x);
+  box-sizing: border-box;
+
+  /* 视觉样式 */
+  background-color: var(--search-bg-primary);
+  border: 1px solid var(--search-border-color);
+  border-radius: var(--search-input-radius);
+  outline: none;
+
+  /* 排版 */
+  font-size: var(--font-size-search);
+  color: var(--search-text-primary);
+
+  /* 交互 */
+  transition: border-color var(--transition-normal);
+}
+
+/* 悬浮时边框轻微高亮（参照 VS Code）：聚焦本身不改变边框，但悬浮效果始终生效 */
+.search-input:hover {
+  border-color: color-mix(in oklch, var(--ring) 40%, var(--search-border-color));
+}
+
+.search-input::placeholder {
+  color: var(--search-text-quaternary);
+}
+
+/* 替换输入框：右侧只有一个保留大小写按钮，收窄右内边距与按钮对齐 */
+.search-input-replace {
+  padding-right: calc(var(--search-toggle-size) + var(--space-2));
+}
+
+/* 输入框切换按钮容器 */
+.input-toggles {
+  /* 定位 */
+  position: absolute;
+  right: var(--space-1);
+
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+/* 切换按钮 */
+.toggle-button {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  width: var(--search-toggle-size);
+  height: var(--search-toggle-size);
+
+  /* 视觉样式 */
+  background: transparent;
+  border: none;
+  border-radius: var(--search-btn-radius);
+
+  /* 排版 */
+  font-size: var(--font-size-search-small);
+  color: var(--search-text-secondary);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle-button:hover {
+  background-color: color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+.toggle-button.active {
+  /* 参照 VS Code：半透明主题色底 + 主题色文字，选中态清晰可辨 */
+  color: var(--search-accent-color);
+  background-color: color-mix(in oklch, var(--search-accent-color) 35%, transparent);
+}
+
+/* ============================================
+   匹配计数
+   ============================================ */
+
+.match-count {
+  /* 盒模型 */
+  padding: 0 var(--space-1);
+
+  /* 排版 */
+  font-size: var(--font-size-search-small);
+  color: var(--search-text-tertiary);
+  white-space: nowrap;
+}
+
+/* ============================================
+   中心操作区
+   ============================================ */
+
+.center-actions {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  /* 盒模型 */
+  width: 50px;
+}
+
+/* 导航按钮组 */
+.nav-buttons {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: var(--search-gap-xs);
+}
+
+/* ============================================
+   工具栏按钮
+   ============================================ */
+
+.toolbar-button {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  width: var(--search-btn-size);
+  height: var(--search-btn-size);
+  padding: 0;
+
+  /* 视觉样式 */
+  background: transparent;
+  border: none;
+  border-radius: var(--search-btn-radius);
+
+  /* 排版 */
+  color: var(--search-text-secondary);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toolbar-button:hover {
+  background-color: color-mix(in oklch, var(--foreground) 10%, transparent);
+  color: var(--search-text-primary);
+}
+
+.toolbar-button:disabled {
+  opacity: var(--search-disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* 切换按钮 */
+.toggle-btn {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  padding: 0;
+}
+
+/* ============================================
+   替换操作区
+   ============================================ */
+
+.replace-actions {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: var(--search-gap-xs);
+}
+
+/* 图标操作按钮 */
+.icon-action-button {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  width: var(--search-btn-size);
+  height: var(--search-btn-size);
+  padding: 0;
+
+  /* 视觉样式 */
+  background: transparent;
+  border: none;
+  border-radius: var(--search-btn-radius);
+
+  /* 排版 */
+  color: var(--search-text-secondary);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-action-button:hover {
+  background-color: color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+.icon-action-button:disabled {
+  opacity: var(--search-disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* ============================================
+   占位符
+   ============================================ */
+
+/* 工具栏占位符 */
+.toolbar-placeholder {
+  width: var(--btn-icon-size);
+}
+
+/* 导航按钮占位列 */
+.nav-buttons-placeholder {
+  /* 盒模型 */
+  /* 与查找行的两个导航按钮等宽（24px × 2 + 2px 间距） */
+  width: calc(var(--search-btn-size) * 2 + var(--search-gap-xs));
+  flex-shrink: 0;
+}
+
+/* 关闭按钮占位列 */
+.close-placeholder {
+  /* 盒模型 */
+  width: var(--btn-icon-size);
+  flex-shrink: 0;
+}

@@ -1,0 +1,187 @@
+/**
+ * Textox 编辑器统一样式入口文件
+ * 按功能模块组织，支持多主题
+ */
+
+/* 1. 基础变量 */
+@import './variables.css';
+
+/* 2. 默认主题（静态加载防闪烁，其他主题通过 style 注入） */
+@import './themes/default.css';
+
+/* 3. 基础样式 */
+@import './base.css';
+
+/* 4. 编辑器内容基础样式（使用主题定义的变量） */
+@import './writer.css';
+
+/* 5. 组件样式 */
+@import './components/app.css';
+@import './components/sidebar.css';
+@import './components/title-bar.css';
+@import './components/directory-tree.css';
+@import './components/scroll-edge.css';
+@import './components/outline-minimap.css';
+@import './components/editor.css';
+@import './components/settings.css';
+@import './components/search.css';
+@import './components/inline-styles.css';
+@import './components/misc.css';
+@import './components/plugin-editor.css';
+@import './components/image-ref.css';
+@import './components/agent.css';
+
+/* 6. 打印样式（放在最后以确保优先级） */
+@import './components/print.css';
+
+@import "tailwindcss";
+
+/* Streamdown 的类名在 node_modules 中，Tailwind v4 默认不扫描 */
+@source "../../../node_modules/streamdown/dist/**/*.js";
+
+@import "tw-animate-css";
+
+@import "shadcn/tailwind.css";
+
+/* code-block 样式放在最后以确保优先级 */
+@import './components/code-block.css';
+
+/* react-aria-components color picker styles */
+@import './components/rac-color.css';
+
+/*---break---*/
+
+@custom-variant dark (&:is(.dark *));
+
+/*---break---
+ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  --tw-ring-shadow: 0 0 #0000 !important;
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow) !important;
+}
+
+/*---break---
+ */
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 15px;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-warning: var(--warning);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-overlay: var(--overlay);
+  --color-overlay-light: var(--overlay-light);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* RTL 内容方向支持 */
+/* 仅影响编辑器内容区，不影响 UI chrome 布局 */
+.editor-content-rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.editor-content-rtl .ProseMirror {
+  text-align: right;
+}
+
+.editor-content-rtl .ProseMirror ul,
+.editor-content-rtl .ProseMirror ol {
+  padding-left: 0;
+  padding-right: 1.5em;
+}
+
+.editor-content-rtl .ProseMirror li[data-type="taskItem"] {
+  flex-direction: row-reverse;
+}
+
+.editor-content-rtl .ProseMirror li[data-type="taskItem"] > label {
+  margin-right: 0;
+  margin-left: 0.5em;
+}
+
+.editor-content-rtl .ProseMirror blockquote {
+  border-left: none;
+  border-right: 3px solid var(--border);
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+.editor-content-rtl .cm-editor,
+.editor-content-rtl .cm-container,
+.editor-content-rtl .code-block-wrapper {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+.editor-content-rtl .cm-content {
+  direction: ltr !important;
+}
+
+.editor-content-rtl .ProseMirror td,
+.editor-content-rtl .ProseMirror th {
+  text-align: right;
+}
+
+.editor-content-rtl .ProseMirror p,
+.editor-content-rtl .ProseMirror h1,
+.editor-content-rtl .ProseMirror h2,
+.editor-content-rtl .ProseMirror h3,
+.editor-content-rtl .ProseMirror h4,
+.editor-content-rtl .ProseMirror h5,
+.editor-content-rtl .ProseMirror h6 {
+  unicode-bidi: plaintext;
+}

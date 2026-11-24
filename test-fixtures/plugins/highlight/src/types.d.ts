@@ -1,0 +1,6 @@
+// markdown-it-mark 不自带类型声明，DefinitelyTyped 也没有。
+declare module 'markdown-it-mark' {
+  import { PluginSimple } from 'markdown-it';
+  const plugin: PluginSimple;
+  export default plugin;
+}

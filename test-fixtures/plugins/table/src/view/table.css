@@ -1,0 +1,81 @@
+/* Table-private styles for the table plugin. Sourced from the main app's
+ * CSS-variable widgets (`src/components/TextoEditor/styles/widgets.css`),
+ * keeping the `.texto-editor` scope and `var(--*)` theme tokens so the
+ * floating resize popup follows dark/light themes. The shared neutral
+ * chrome (`.floating-toolbar*`) lives in the core widgets stylesheet and
+ * is intentionally not duplicated here. */
+
+/* ─── Table layout ────────────────────────────────────────── */
+.texto-editor .ProseMirror table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 0 0 16px;
+}
+.texto-editor .ProseMirror table th,
+.texto-editor .ProseMirror table td {
+  word-break: break-word;
+}
+/* 未显式设置对齐的表头按左对齐显示（browser 默认居中）。显式对齐仍走
+ * 单元格上的内联 text-align，优先级高于这里的规则。 */
+.texto-editor .ProseMirror table th {
+  text-align: left;
+}
+/* Header colors come from neutral theme tokens (the core `#writer table th`
+ * rule consumes the same tokens with an `--editor-table-*` fallback, so this
+ * rule covers non-`#writer` hosts such as the editor's own test harness). */
+.texto-editor .ProseMirror table th {
+  background: var(--md-grid-header-bg, transparent);
+  color: var(--md-grid-header-text, inherit);
+}
+
+/* Table-private trash hover — overrides the shared chrome's neutral hover. */
+.table-tb-trash:hover { background: var(--muted); color: var(--foreground); }
+
+/* ─── Table resize popup (body-mounted floating UI) ──────────────── */
+.table-resize-popup {
+  position: fixed;
+  display: none;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 11;
+}
+.table-resize-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 14px);
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.table-resize-cell {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--background);
+  cursor: pointer;
+}
+.table-resize-cell.hover {
+  background: var(--muted-foreground);
+  border-color: var(--muted-foreground);
+}
+.table-resize-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  font: var(--font-size-base)/1 var(--font-family-base);
+  color: var(--muted-foreground);
+}
+.table-resize-inputs input {
+  width: 32px;
+  padding: 3px 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-base);
+  text-align: center;
+  font: inherit;
+}

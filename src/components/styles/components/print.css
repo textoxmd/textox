@@ -1,0 +1,69 @@
+/* 纸张边距不在这里设置：打印（print_webview）由 NSPrintInfo 提供，数值取自
+   编辑器内容区自身的内边距（getPrintMargins），@page margin 会把内容顶到
+   纸张不可打印区/与编辑器留白不一致。 */
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* 打印渲染中只保留导出克隆体：应用界面（侧边栏/顶栏/编辑器）只在打印
+     输出里被隐藏，屏幕上的界面不受影响。 */
+  body > *:not(#texto-print-overlay) {
+    display: none !important;
+  }
+
+  #texto-print-overlay {
+    position: static !important;
+    width: 100% !important;
+    z-index: auto !important;
+    overflow: visible !important;
+    /* wry 为了透明窗口关闭了 WKWebView 的背景（drawsBackground=NO），打印时页面
+       画布可能不带主题底色；内容区自己保证不透明，避免深色主题打印成白底/空白。 */
+    background-color: var(--background) !important;
+  }
+
+  /* 纸张边距统一由 NSPrintInfo 提供（数值来自编辑器内容区自身的内边距，
+     见 printDocument 的 getPrintMargins），这里清零克隆体自身的内边距：
+     叠加会让左右比上下宽，而且第 2 页起没有这层内边距、与首页不一致。
+     html.texto-printing 只在打印路径添加，导出 PDF 不受影响。 */
+  html.texto-printing #texto-print-overlay .ProseMirror {
+    padding: 0 !important;
+  }
+
+  .cb-chrome,
+  .code-block-header,
+  .mermaid-action-buttons {
+    display: none !important;
+  }
+
+  /* 分页优化：避免代码块/表格行/图片/公式被拦腰截断，标题不与正文分离 */
+  pre,
+  blockquote,
+  tr,
+  img,
+  .mermaid-container,
+  .katex-display {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+}
+
+/* 导出 PDF 期间，页面画布使用主题背景色。
+   WKWebView 导出的 PDF 页面高度按窗口走，内容不足一屏时底部空白
+   会露出原生窗口背景色，与主题 --background 不一致；此规则让整页
+   （含最后一页底部）都使用主题背景。 */
+html.texto-exporting {
+  background-color: var(--background);
+}

@@ -1,0 +1,202 @@
+# Textox
+
+[![License](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](LICENSE)
+[![CI](https://github.com/chenhualinx/Textox/actions/workflows/ci.yml/badge.svg)](https://github.com/chenhualinx/Textox/actions/workflows/ci.yml)
+[![Build](https://github.com/chenhualinx/Textox/actions/workflows/build.yml/badge.svg)](https://github.com/chenhualinx/Textox/actions/workflows/build.yml)
+
+**简体中文** | [English](README.en.md)
+
+Textox 是一个本地优先的 Markdown 编辑器：极简设计、开箱即用，融合 IDE 的工作区理念，
+基于 Tauri v2、React 与 ProseMirror 构建。
+
+## 特性
+
+- **双模式编辑**：所见即所得（IR）与源码视图（SV），共享同一套撤销/重做历史
+- **数学公式**：内置 MathJax，支持 LaTeX 与 mhchem
+- **图表**：Mermaid 流程图、时序图、甘特图等
+- **代码块**：语法高亮 + CodeMirror 编辑体验
+- **表格 / 任务列表 / 脚注 / 高亮** 等 Markdown 扩展
+- **白板**：基于 Excalidraw fork 的 `.excalidraw` 文件编辑与内嵌预览（由插件提供）
+- **多主题**：多套编辑器主题与字体切换
+- **图片粘贴**：粘贴即保存，可接入自定义图床插件
+- **工作区**：侧边栏目录树、多窗口、文件内搜索
+- **插件系统**：外部插件运行时 + 声明式扩展点
+- **AI 能力**：可配置模型档案（BYO API Key），支持解释、翻译等插件
+- **MCP 服务端**：本机回环的 MCP 接口，供外部 Agent 读写当前文档
+
+## 技术栈
+
+| 层 | 技术 |
+| --- | --- |
+| 桌面容器 | Tauri v2（Rust） |
+| 前端 | React 19 + TypeScript + Vite + Tailwind CSS v4 |
+| 编辑器 | ProseMirror（IR）、CodeMirror 6（SV） |
+| 渲染/导出 | markdown-it、Mermaid、MathJax、highlight.js |
+| 包管理 | Bun（唯一） |
+
+## 环境要求
+
+- [Bun](https://bun.sh) 1.2+
+- Rust stable（rustup）+ Tauri 2 的系统依赖，见 [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
+- Node.js 20+（部分构建脚本使用）
+- macOS 需要 Xcode Command Line Tools
+
+## 快速开始
+
+仓库依赖 4 个 git submodule，克隆时必须一并检出：
+
+```sh
+git clone --recurse-submodules https://github.com/chenhualinx/Textox.git
+cd Textox
+
+# 已克隆但缺少子模块时
+git submodule update --init --recursive
+
+bun install
+(cd src-tauri && cargo fetch)
+```
+
+启动：
+
+```sh
+bun run app:dev      # 完整桌面应用（Tauri + Vite）
+bun run dev          # 仅前端，浏览器访问 http://localhost:1420
+```
+
+## 构建与打包
+
+所有构建都走统一入口，参数一致：`--edition full|lite`、`--platform macos|windows`、`--store`。
+
+```sh
+# 桌面开发（默认完整版；--edition lite 切 Lite）
+bun run app:dev
+bun run app:dev -- --edition lite
+
+# 构建（macOS 默认 universal）
+bun run app:build
+bun run app:build -- --edition lite
+bun run app:build -- --debug --no-sign
+
+# 打包安装包（只区分渠道，格式由平台决定）
+bun run app:package                 # 直接安装：macOS DMG / Windows MSI+NSIS
+bun run app:package -- --edition lite
+bun run app:package -- --store      # 应用商店：macOS PKG / Windows MSIX
+```
+
+> Windows 的免费版与付费版当前都提供完整功能，仅 bundle identifier 与商店条目不同。
+
+可分发产物（DMG / PKG / MSIX）复制到 `out/`；MSI/NSIS 仍由 Tauri 输出在 `src-tauri/target/release/bundle/`。
+
+`make` 只是薄别名（见 `make help`），逻辑全部在 `scripts/build/`。
+
+### 代码签名
+
+仓库**不包含**任何 Apple 开发者证书或 provisioning profile。签名信息只从环境变量读取：
+
+```sh
+export TEXTO_APP_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+export TEXTO_INSTALLER_SIGNING_IDENTITY="Developer ID Installer: Your Name (TEAMID)"
+```
+
+未设置时构建会跳过签名并给出提示；`--no-sign` 可显式跳过。商店（PKG）构建还需要把
+`embedded.provisionprofile` / `embedded.provisionprofile.lite` 放到 `src-tauri/`（已 gitignore）。
+
+> `src-tauri/entitlements*.plist` 中的 `com.apple.application-identifier` 与
+> `com.apple.developer.team-identifier` 仍是原开发团队的 Team ID。用你自己的团队做
+> App Store 构建前请替换为自己的值；只做本地/直接安装构建时，可删除这两个键。
+
+### 崩溃上报
+
+仓库不内置 Sentry DSN，从源码构建的版本不会上报数据。官方构建通过编译期环境变量注入：
+
+```sh
+SENTRY_DSN="https://<key>@<host>/<project>" bun run app:build
+```
+
+## 在 GitHub Actions 上构建
+
+仓库带两个工作流：
+
+| 工作流 | 触发 | 作用 |
+|---|---|---|
+| `ci.yml` | push（main / develop）、PR | 类型检查、架构守卫、前后端测试、`cargo check` / `clippy` |
+| `build.yml` | 手动 `Run workflow`、推送 `v*` 标签 | 产安装包：macOS DMG（full / lite，universal）+ Windows MSI/NSIS |
+
+手动运行时可选 `edition`（`both` / `full` / `lite`）与 `store`（macOS 出 PKG 而非 DMG）。
+推送 `v*` 标签会额外把产物附加到一个 **draft release**，确认无误后手动发布。
+
+**不配置任何 secret 也能跑**，产物为未签名安装包，适合内部测试。正式分发需要在
+仓库 Settings → Secrets and variables → Actions 中配置：
+
+| Secret | 用途 |
+|---|---|
+| `APPLE_CERTIFICATE_P12` | 开发者证书 `.p12` 的 base64（`base64 -i cert.p12 \| pbcopy`） |
+| `APPLE_CERTIFICATE_PASSWORD` | `.p12` 密码 |
+| `APPLE_PROVISION_PROFILE` | full 版 Mac App Store profile 的 base64 |
+| `APPLE_PROVISION_PROFILE_LITE` | lite 版 profile 的 base64 |
+| `TEXTO_APP_SIGNING_IDENTITY` | 如 `Apple Distribution: Your Name (TEAMID)` |
+| `TEXTO_INSTALLER_SIGNING_IDENTITY` | 如 `3rd Party Mac Developer Installer: Your Name (TEAMID)` |
+
+同时需按上一节把 `src-tauri/entitlements*.plist` 的 Team ID 换成自己的。
+Windows 目前没有接入代码签名，MSI/NSIS 会被 SmartScreen 提示。
+
+注意事项：
+
+- macOS runner 按 10 倍时长计费，私有仓库请留意额度；可在 fork 里只跑 `full`。
+- 未签名 DMG 在别的机器上会被 Gatekeeper 拦，右键打开或 `xattr -dr com.apple.quarantine Textox.app`。
+- 公证书（notarytool）尚未接入，对外正式分发前建议补上。
+- `bun.lock` 中部分包记录的是国内镜像地址，CI 上可正常安装但可能偏慢。
+
+## 测试与检查
+
+```sh
+bun run typecheck                              # 全仓类型检查
+bun run test:plugins                           # 插件/骨架契约单测
+bun run check:skeleton                         # 骨架不得出现插件专属字面量
+bun run check:editor-boundary                  # 编辑器不得 import 骨架
+bun run check:version                          # 三处版本号一致
+
+# 编辑器行为测试（spec 驱动）
+bunx vitest run --config src/components/TextoEditor/vitest.config.ts
+
+make check                                     # 前端 + Rust 全量检查
+make check-rust                                # cargo check + clippy -D warnings
+```
+
+## 目录结构
+
+```
+src/                      React 前端（@/ → src/）
+  components/TextoEditor/ ProseMirror 编辑器（独立 tsconfig / vitest config）
+  plugins/                插件运行时、注册表与宿主能力
+  agent/                  AI 模型配置与 runtime
+src-tauri/                Tauri v2 Rust 后端（含 MCP 服务端）
+packages/                 内部 workspace 包（app-api、plugin-sdk、export-runtime 等）
+test-fixtures/plugins/    第一方插件测试夹具（不进生产包）
+vendor/                   git submodule（excalidraw / translations / plugin-sdk / mkdext）
+scripts/build/            统一构建入口（dev / build / package）
+docs/                     插件开发、运行时与图标规范
+```
+
+## 插件开发
+
+插件契约见 [`vendor/plugin-sdk`](vendor/plugin-sdk)，构建工具为 `@textox/plugin-build`。
+详细文档：[docs/plugin-development.md](docs/plugin-development.md)、
+[docs/plugin-runtime.md](docs/plugin-runtime.md)、[docs/plugin-icon-spec.md](docs/plugin-icon-spec.md)。
+
+## 贡献
+
+欢迎提交 issue 与 PR，请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 与
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。分支策略：功能开发基于 `develop`，`main` 用于发布。
+
+## 安全
+
+安全问题请勿公开提交，见 [SECURITY.md](SECURITY.md)。
+
+## 许可证
+
+本项目以 [GNU Affero General Public License v3.0 or later](LICENSE) 发布。
+`Textox` 名称、Logo 与图标不在授权范围内，见 [NOTICE](NOTICE)。
+
+第三方组件的版权与许可证见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+（MathJax 的 Apache-2.0 文本位于 [public/mathjax/LICENSE](public/mathjax/LICENSE)）。

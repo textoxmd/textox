@@ -1,0 +1,14 @@
+{
+  identifier: "com.texto.markdown.lite",
+  build: {
+    beforeBuildCommand: "bun run scripts/build/frontend.mjs build --edition lite",
+    beforeDevCommand: "bun run scripts/build/frontend.mjs dev --edition lite",
+  },
+  bundle: {
+    windows: {
+      webviewInstallMode: {
+        type: "skip",
+      },
+    },
+  },
+}

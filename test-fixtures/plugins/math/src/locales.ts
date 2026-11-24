@@ -1,0 +1,111 @@
+import type { PluginLocale } from '@texto/plugin-sdk';
+
+export const defaultLocale = 'en-US';
+
+export const locales: Record<string, PluginLocale> = {
+  'en-US': {
+    pluginName: 'Math',
+    pluginDescription: 'Render LaTeX math formulas in fenced code blocks',
+    mathBlock: 'Math Block',
+    mathBlockDesc: 'Insert math block',
+    copySource: 'Copy LaTeX Source',
+  },
+  'zh-CN': {
+    pluginName: '数学公式',
+    pluginDescription: '在代码块中渲染 LaTeX 数学公式',
+    mathBlock: '数学公式',
+    mathBlockDesc: '插入数学公式块',
+    copySource: '复制 LaTeX 源码',
+  },
+  'zh-TW': {
+    pluginName: '數學公式',
+    pluginDescription: '在程式碼區塊中渲染 LaTeX 數學公式',
+    mathBlock: '數學公式',
+    mathBlockDesc: '插入數學公式',
+    copySource: '複製 LaTeX 原始碼',
+  },
+  'ja-JP': {
+    pluginName: '数式',
+    pluginDescription: 'コードブロック内の LaTeX 数式をレンダリング',
+    mathBlock: '数式ブロック',
+    mathBlockDesc: '数式ブロックを挿入',
+    copySource: 'LaTeX ソースをコピー',
+  },
+  'ko-KR': {
+    pluginName: '수식',
+    pluginDescription: '코드 블록의 LaTeX 수식을 렌더링합니다',
+    mathBlock: '수식 블록',
+    mathBlockDesc: '수식 블록 삽입',
+    copySource: 'LaTeX 소스 복사',
+  },
+  'fr-FR': {
+    pluginName: 'Formules mathématiques',
+    pluginDescription: 'Rendre les formules mathématiques LaTeX dans les blocs de code',
+    mathBlock: 'Bloc mathématique',
+    mathBlockDesc: 'Insérer un bloc mathématique',
+    copySource: 'Copier la source LaTeX',
+  },
+  'de-DE': {
+    pluginName: 'Formeln',
+    pluginDescription: 'LaTeX-Formeln in Codeblöcken darstellen',
+    mathBlock: 'Mathe-Block',
+    mathBlockDesc: 'Mathe-Block einfügen',
+    copySource: 'LaTeX-Quelltext kopieren',
+  },
+  'es-ES': {
+    pluginName: 'Fórmulas matemáticas',
+    pluginDescription: 'Renderiza fórmulas matemáticas LaTeX en bloques de código',
+    mathBlock: 'Bloque matemático',
+    mathBlockDesc: 'Insertar bloque matemático',
+    copySource: 'Copiar código LaTeX',
+  },
+  'it-IT': {
+    pluginName: 'Formule matematiche',
+    pluginDescription: 'Visualizza le formule matematiche LaTeX nei blocchi di codice',
+    mathBlock: 'Blocco matematico',
+    mathBlockDesc: 'Inserisci blocco matematico',
+    copySource: 'Copia sorgente LaTeX',
+  },
+  'pt-PT': {
+    pluginName: 'Fórmulas matemáticas',
+    pluginDescription: 'Renderiza fórmulas matemáticas LaTeX em blocos de código',
+    mathBlock: 'Bloco matemático',
+    mathBlockDesc: 'Inserir bloco matemático',
+    copySource: 'Copiar código LaTeX',
+  },
+  'ru-RU': {
+    pluginName: 'Формулы',
+    pluginDescription: 'Отображение математических формул LaTeX в блоках кода',
+    mathBlock: 'Математический блок',
+    mathBlockDesc: 'Вставить математический блок',
+    copySource: 'Скопировать исходник LaTeX',
+  },
+  'ar-SA': {
+    pluginName: 'الصيغ الرياضية',
+    pluginDescription: 'عرض صيغ LaTeX الرياضية داخل كتل التعليمات البرمجية',
+    mathBlock: 'كتلة رياضية',
+    mathBlockDesc: 'إدراج كتلة رياضية',
+    copySource: 'نسخ مصدر LaTeX',
+  },
+  'hi-IN': {
+    pluginName: 'गणित',
+    pluginDescription: 'कोड ब्लॉक में LaTeX गणितीय सूत्र प्रस्तुत करें',
+    mathBlock: 'गणित ब्लॉक',
+    mathBlockDesc: 'गणित ब्लॉक सम्मिलित करें',
+    copySource: 'LaTeX स्रोत कॉपी करें',
+  },
+  'th-TH': {
+    pluginName: 'คณิตศาสตร์',
+    pluginDescription: 'แสดงสูตรคณิตศาสตร์ LaTeX ในบล็อกโค้ด',
+    mathBlock: 'บล็อกคณิตศาสตร์',
+    mathBlockDesc: 'แทรกบล็อกคณิตศาสตร์',
+    copySource: 'คัดลอกซอร์ส LaTeX',
+  },
+  'vi-VN': {
+    pluginName: 'Công thức toán học',
+    pluginDescription: 'Hiển thị công thức toán LaTeX trong khối mã',
+    mathBlock: 'Khối toán',
+    mathBlockDesc: 'Chèn khối toán học',
+    copySource: 'Sao chép mã nguồn LaTeX',
+  },
+};

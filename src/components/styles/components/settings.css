@@ -1,0 +1,2180 @@
+/**
+ * 设置相关组件样式
+ * 包含 SettingsWindow、SettingsModal、ShortcutSettings
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     基础颜色
+     ------------------------------------------ */
+  --settings-text-primary: var(--foreground);
+  --settings-text-secondary: var(--muted-foreground);
+  --settings-text-tertiary: color-mix(in oklch, var(--muted-foreground) 80%, var(--foreground));
+  --settings-text-quaternary: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+
+  /* 背景色：使用 sidebar 作为侧边栏背景，与 titlebar 保持一致 */
+  --settings-bg-primary: var(--background);
+  --settings-bg-secondary: var(--sidebar);
+  /* 侧边栏选中项 - 使用与主题协调的淡粉色 */
+  --settings-bg-tertiary: var(--muted);
+  --settings-bg-quaternary: color-mix(in oklch, var(--secondary) 80%, transparent);
+
+  --settings-border: var(--border);
+  --settings-border-color: var(--border);
+
+  /* ------------------------------------------
+     错误/警告颜色
+     ------------------------------------------ */
+  --settings-error-bg: color-mix(in oklch, var(--destructive) 10%, transparent);
+  --settings-error-border: color-mix(in oklch, var(--destructive) 30%, transparent);
+  --settings-error-text: var(--destructive);
+
+  /* ------------------------------------------
+     尺寸
+     ------------------------------------------ */
+  --settings-base-unit: 1rem;
+  --settings-sidebar-width: 200px;
+  --settings-color-picker-size: 20px;
+  --settings-color-picker-ring: 25px;
+  --settings-about-avatar-size: 80px;
+
+
+  /* ------------------------------------------
+     间距
+     ------------------------------------------ */
+  --settings-padding-xs: calc(var(--settings-base-unit) * 0.125);
+  --settings-padding-sm: calc(var(--settings-base-unit) * 0.25);
+  --settings-padding-md: calc(var(--settings-base-unit) * 0.5);
+  --settings-padding-lg: calc(var(--settings-base-unit) * 0.75);
+  --settings-padding-xl: calc(var(--settings-base-unit) * 1);
+
+  /* ------------------------------------------
+     圆角
+     ------------------------------------------ */
+  --settings-radius-sm: var(--radius-sm);
+  --settings-radius-md: var(--radius-md);
+  --settings-radius-lg: var(--radius-lg);
+  --settings-radius-xl: var(--radius-xl);
+  --settings-radius-full: var(--radius-full);
+
+  /* ------------------------------------------
+     阴影
+     ------------------------------------------ */
+  --settings-shadow-sm: 0 1px 2px 0 color-mix(in oklch, var(--foreground) 8%, transparent);
+
+}
+
+/* ============================================
+   SettingsWindow 组件样式
+   ============================================ */
+
+/* 设置页面容器 */
+.settings-page {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* 盒模型 */
+  height: 100vh;
+
+  /* 视觉 */
+  background-color: var(--settings-bg-primary);
+
+  /* 排版 */
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-settings);
+  color: var(--settings-text-primary);
+}
+
+/* 设置布局 */
+.settings-layout {
+  /* 布局 */
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 左侧边栏区域 */
+.settings-sidebar-area {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  /* 盒模型 */
+  width: var(--settings-sidebar-width);
+  height: 100%;
+  border-right: 1px solid var(--settings-border);
+
+  /* 视觉 */
+  background-color: var(--settings-bg-secondary);
+}
+
+/* 左侧标题栏 */
+.settings-sidebar-titlebar {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  /* 盒模型 */
+  height: var(--titlebar-height, 32px);
+  padding: 0 var(--space-3);
+
+  /* 视觉 */
+  background-color: var(--settings-bg-secondary);
+
+  /* 交互 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.settings-sidebar-titlebar-content {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.settings-sidebar-title {
+  /* 排版 */
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--settings-text-primary);
+}
+
+/* 设置侧边栏 */
+.settings-sidebar {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+
+  /* 盒模型 */
+  padding-top: var(--space-2);
+  border: none;
+
+  /* 视觉 */
+  background-color: var(--settings-bg-secondary);
+  box-shadow: none;
+
+  /* 交互 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* 右侧内容区域 */
+.settings-content-area {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+
+  /* 视觉 */
+  background-color: var(--settings-bg-primary);
+}
+
+/* 右侧标题栏 */
+.settings-content-titlebar {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+
+  /* 盒模型 */
+  height: var(--titlebar-height, 32px);
+  padding: 0 var(--space-3);
+
+  /* 视觉 */
+  background-color: var(--settings-bg-primary);
+
+  /* 交互 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.settings-content-titlebar-left {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.settings-content-titlebar-icon {
+  /* 盒模型 */
+  width: 16px;
+  height: 16px;
+
+  /* 视觉 - 与编辑器标题栏一致 */
+  color: var(--titlebar-text-secondary);
+}
+
+.settings-content-title {
+  /* 排版 */
+  font-size: var(--titlebar-font-size);
+  font-weight: var(--font-weight-medium);
+  /* 视觉 - 与编辑器标题栏一致 */
+  color: var(--titlebar-text-secondary);
+}
+
+.settings-content-titlebar-right {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Windows 下内容标题栏 - 按钮右对齐到边缘 */
+.settings-content-titlebar.windows {
+  justify-content: space-between;
+  padding-right: 0;
+}
+
+.settings-content-titlebar.windows .settings-content-titlebar-right {
+  gap: 0;
+  height: 100%;
+  align-self: stretch;
+}
+
+.window-controls .window-control-button {
+  -webkit-app-region: no-drag;
+}
+
+/* 设置导航 */
+.settings-nav {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+
+  /* 盒模型 */
+  padding: 0 var(--space-2);
+
+  /* 交互 */
+  user-select: none;
+}
+
+/* 设置导航项 */
+.settings-nav-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+
+  /* 盒模型 */
+  padding: var(--space-2) var(--space-3);
+  margin: var(--space-xs) 0;
+  border: none;
+  border-radius: var(--settings-radius-lg);
+
+  /* 视觉 */
+  background: transparent;
+  color: var(--settings-text-secondary);
+
+  /* 排版 */
+  text-align: left;
+  font-size: var(--font-size-settings);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.settings-nav-item:hover {
+  background: color-mix(in oklch, var(--sidebar-accent) 70%, transparent);
+}
+
+.settings-nav-item.active {
+  /* 视觉 - 使用与文件树选中项一致的粉色 */
+  background-color: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+
+  /* 排版 */
+  font-weight: var(--font-weight-medium);
+}
+
+/* 设置导航图标 */
+.settings-nav-icon {
+  /* 盒模型 */
+  width: 16px;
+  height: 16px;
+
+  /* 视觉 */
+  opacity: 0.8;
+}
+
+.settings-nav-item.active .settings-nav-icon {
+  opacity: 1;
+}
+
+/* 模型设置图标：设置页只做静态展示；加载态的缩放动画由 agent.css 单独驱动 */
+.model-settings-icon__bar {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* 设置内容区 */
+.settings-content {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* 盒模型 */
+  padding: var(--space-2);
+  gap: var(--space-4);
+
+  /* 视觉 */
+  background-color: var(--settings-bg-primary);
+}
+
+/* 设置项 - 水平布局 */
+.settings-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /* 盒模型 */
+  gap: var(--space-6);
+  padding: var(--space-1) 0;
+}
+
+/* 开关类设置项（末尾控件是 Checkbox / Switch 且带描述）：改成上下两段布局——
+   第一行「标签 + 开关」垂直居中对齐，长描述作为第二行跨整行灰字说明，
+   不再和开关挤同一行。没有描述的开关行保持原来的单行水平布局，
+   避免凭空多出一行空白的 desc 网格区。 */
+.settings-item:has(> :last-child[data-slot="checkbox"]):has(.settings-item-description:not(:empty)),
+.settings-item:has(> :last-child[data-slot="switch"]):has(.settings-item-description:not(:empty)) {
+  /* 布局 */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label control"
+    "desc  desc";
+  align-items: center;
+
+  /* 盒模型 */
+  column-gap: var(--space-6);
+  row-gap: var(--space-1);
+}
+
+.settings-item:has(> :last-child[data-slot="checkbox"]):has(.settings-item-description:not(:empty)) .settings-item-info,
+.settings-item:has(> :last-child[data-slot="switch"]):has(.settings-item-description:not(:empty)) .settings-item-info {
+  /* 让 label / description 直接参与外层网格排布 */
+  display: contents;
+}
+
+.settings-item:has(> :last-child[data-slot="checkbox"]):has(.settings-item-description:not(:empty)) .settings-item-label,
+.settings-item:has(> :last-child[data-slot="switch"]):has(.settings-item-description:not(:empty)) .settings-item-label {
+  grid-area: label;
+}
+
+.settings-item:has(> :last-child[data-slot="checkbox"]):has(.settings-item-description:not(:empty)) .settings-item-description,
+.settings-item:has(> :last-child[data-slot="switch"]):has(.settings-item-description:not(:empty)) .settings-item-description {
+  grid-area: desc;
+  min-width: 0;
+
+  /* 限制行长：避免第二行灰字横向铺满整张卡片，保持可读性 */
+  max-width: 48ch;
+}
+
+.settings-item:has(> :last-child[data-slot="checkbox"]):has(.settings-item-description:not(:empty)) > :last-child,
+.settings-item:has(> :last-child[data-slot="switch"]):has(.settings-item-description:not(:empty)) > :last-child {
+  grid-area: control;
+  justify-self: end;
+  align-self: center;
+}
+
+/* 设置项信息 */
+.settings-item-info {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+
+  /* 盒模型 */
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* 设置项标签 */
+.settings-item-label {
+  /* 排版 */
+  font-size: var(--font-size-settings);
+  font-weight: var(--font-weight-normal);
+  color: var(--settings-text-primary);
+}
+
+/* 设置项描述 */
+.settings-item-description {
+  /* 排版 */
+  font-size: var(--font-size-settings-small);
+  color: var(--settings-text-quaternary);
+}
+
+/* 描述中的代码片段（如 <div>、> [!NOTE]）以等宽+浅底色呈现 */
+.settings-item-description code {
+  font-family: var(--font-family-mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  border-radius: var(--radius-md);
+  white-space: break-spaces;
+}
+
+/* 设置项 - 垂直布局 */
+.settings-item-vertical {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+
+  /* 盒模型 */
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+/* ============================================
+   插件中心：分组与单列列表
+   ============================================ */
+
+/* 插件中心外层：与其它设置页保持一致的外圈留白
+   （设置容器自身 8px + 这里 16px = 24px）。 */
+.plugin-center {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.plugin-group-title {
+  font-size: var(--font-size-settings-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--settings-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+/* 单列列表：一行一个插件（对齐 VSCode 扩展面板观感） */
+.plugin-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.plugin-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 78px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--settings-radius-lg);
+  background-color: var(--card);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--border) 78%, transparent);
+  cursor: pointer;
+  transition: box-shadow var(--transition-normal), background-color var(--transition-normal);
+}
+
+.plugin-row:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 45%, var(--border));
+  background-color: color-mix(in oklch, var(--card) 96%, var(--foreground));
+}
+
+.plugin-row:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--primary), 0 0 0 2px var(--ring);
+}
+
+/* 禁用置灰用 filter 而非 opacity：入场动画（plugin-item-in，fill-mode forwards）
+   会永久保留 opacity: 1，且动画声明优先级高于普通声明，用 opacity 会被覆盖。 */
+.plugin-row[data-disabled="true"] {
+  filter: opacity(0.6);
+}
+
+/* 中间列：名称 / 描述 / 作者·版本 */
+.plugin-row-main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.plugin-row-name {
+  font-size: var(--font-size-settings);
+  font-weight: var(--font-weight-medium);
+  color: var(--settings-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plugin-row-desc {
+  font-size: var(--font-size-settings-small);
+  line-height: 1.4;
+  color: var(--settings-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plugin-row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.plugin-row-author {
+  font-size: 11px;
+  color: var(--settings-text-quaternary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 详情页头部描述：可换行，不省略 */
+.plugin-detail-desc {
+  font-size: var(--font-size-settings-small);
+  line-height: 1.5;
+  color: var(--settings-text-secondary);
+}
+
+/* 操作区：右下角，并阻断点击冒泡到行 */
+.plugin-actions {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.plugin-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  background-color: color-mix(in oklch, var(--muted) 70%, transparent);
+  color: var(--settings-text-secondary);
+}
+
+.plugin-badge-official {
+  background-color: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+/* 加载失败徽标：与正文错误提示同一危险色，不新造配色 */
+.plugin-badge-error {
+  background-color: color-mix(in oklch, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+/* ---- 插件管理卡片（新面板 PluginRow） ----
+   App Store 风格：48px 圆角图标 + 顶部对齐的名称/版本 + 两行描述 + 底部标签与胶囊按钮。 */
+.plugin-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-2);
+}
+
+.plugin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 14px;
+  border: 1px solid var(--settings-border);
+  border-radius: var(--settings-radius-lg);
+  /* 比页面底色略深一档：浅色主题下是极淡的灰，深色主题下略微抬起 */
+  background-color: color-mix(in oklch, var(--muted) 45%, var(--background));
+
+  cursor: pointer;
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.plugin-card:hover {
+  border-color: color-mix(in oklch, var(--settings-border) 60%, var(--settings-text-quaternary));
+  background-color: color-mix(in oklch, var(--muted) 65%, var(--background));
+}
+
+/* 整卡是 role="button"：焦点环画在内侧，避免被邻居卡片遮挡 */
+.plugin-card:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+/* 图标与名称顶部对齐：align-items 放 start，标题列内部自己排副标题 */
+.plugin-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.plugin-card-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  /* 圆角图标：32px 配 8px 圆角 */
+  border-radius: 8px;
+  background-color: color-mix(in oklch, var(--muted) 65%, transparent);
+  color: var(--primary);
+  /* 品牌图铺满时跟随容器圆角裁剪 */
+  overflow: hidden;
+}
+
+.plugin-card-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.plugin-card-name {
+  font-size: var(--font-size-settings-large);
+  font-weight: var(--font-weight-semibold, 600);
+  line-height: 1.3;
+  color: var(--settings-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plugin-card-meta {
+  font-size: var(--font-size-settings-small);
+  line-height: 1.35;
+  color: var(--settings-text-quaternary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 描述固定两行：卡片高度在网格里保持一致，长描述截断 */
+.plugin-card-desc {
+  margin: 0;
+  font-size: var(--font-size-settings-small);
+  line-height: 1.45;
+  color: var(--settings-text-secondary);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.plugin-card-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  margin-top: auto;
+}
+
+/* 行尾开关：右对齐，尺寸由 `ui/switch` 决定 */
+.plugin-card-switch {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.plugin-detail-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  /* 与卡片图标同比例放大：40px 配 12px 圆角 */
+  border-radius: 12px;
+  background-color: color-mix(in oklch, var(--muted) 65%, transparent);
+  color: var(--primary);
+  overflow: hidden;
+}
+
+/* 行尾操作按钮（齿轮）：打开启用/禁用/卸载菜单 */
+.plugin-actions-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--settings-radius-full);
+  background: transparent;
+  color: var(--settings-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+.plugin-actions-trigger:hover {
+  background-color: color-mix(in oklch, var(--muted) 60%, transparent);
+  color: var(--settings-text-primary);
+}
+
+.plugin-actions-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* 插件中心紧凑视图（grid）：参数与引导页 onboarding.css 的 .plugin-mode-tile 保持一致
+   —— 最小 52px / 圆角 11px / 图标 22px（由组件 PluginGlyph size={22} 提供，不在 CSS 约束）/
+   hover 上浮 3px / 漂浮 3.2s。改动动效参数时请同步两处，否则两处观感会分叉；
+   `plugin-tile-parity.test.ts` 会逐项对拍两处声明。 */
+.plugin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 8px;
+}
+
+.plugin-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  color: var(--primary);
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.plugin-tile:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+/* 颜色由 .plugin-tile 的 color 继承（svg 用 currentColor），此处只管缩放过渡，
+   与引导页 .plugin-mode-tile svg 的 0.16s 缓动对齐。
+   选择器收紧到图标层直接子级：图标内部即使再嵌套 <svg> 也不会被二次缩放。 */
+.plugin-tile-icon > svg {
+  transition: transform 0.16s ease;
+}
+
+.plugin-tile:hover .plugin-tile-icon > svg {
+  transform: scale(1.1);
+}
+
+.plugin-tile:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--primary),
+    0 0 0 3px var(--ring);
+}
+
+/* 置灰必须用 filter（不能换成 opacity）：入场动画 plugin-tile-in 驱动 opacity，
+   backwards 填充在入场与延迟期间会覆盖该声明，禁用态会「先满亮、结束后跳变」；
+   用 filter 则不参与该属性的层叠竞争（见 plugin-center-disabled-dim.test.ts）。 */
+.plugin-tile[data-disabled="true"] {
+  filter: opacity(0.6);
+}
+
+/* 图标层承担漂浮：外层负责 hover 的 transform，内层负责漂浮，互不覆盖。 */
+.plugin-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: plugin-tile-float var(--float-duration, 3.2s) ease-in-out
+    var(--float-delay, 0s) infinite;
+}
+
+@keyframes plugin-tile-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--float-distance, 3px)));
+  }
+}
+
+/* 入场：曲线与时长照搬引导页 plugin-mode-tile-in（0.34s / cubic-bezier(0.22, 1, 0.36, 1)），
+   但只由 .plugin-center--animated 门控（插件中心内部切换视图时），侧边栏首次进入不播。 */
+@keyframes plugin-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 视图切换时逐项入场：淡入 + 轻微上浮（错峰延迟由行内 animation-delay 提供）。
+   仅在插件中心内部切换（容器带 .plugin-center--animated）时播放；从侧边栏
+   首次进入插件页不播放，避免每次点开都闪一下。 */
+@keyframes plugin-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plugin-center--animated .plugin-row {
+  animation: plugin-item-in 0.2s ease-out both;
+}
+
+.plugin-center--animated .plugin-tile {
+  animation: plugin-tile-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plugin-center--animated .plugin-row,
+  .plugin-center--animated .plugin-tile,
+  .plugin-tile-icon {
+    animation: none;
+  }
+
+  .plugin-tile:hover,
+  .plugin-tile:hover .plugin-tile-icon > svg {
+    transform: none;
+  }
+}
+
+/* 插件图标：正方形槽位，图标居中；不加底色方框。列表行 40 / 详情 48 */
+.plugin-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  aspect-ratio: 1 / 1;
+  color: var(--primary);
+}
+
+.plugin-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.plugin-icon-lg {
+  width: 48px;
+}
+
+.plugin-icon-lg svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* ============================================
+   macOS 风格设置分组
+   ============================================
+   卡片内直接排布设置行时，收掉 space-y-* 的大间距改为紧凑相邻，
+   靠行内垂直留白区分行 —— 对齐 macOS System Settings 的列表观感。 */
+
+.settings-content [data-slot="card-content"]:has(> .settings-item) > .settings-item {
+  margin-block: 0 !important;
+  padding: var(--space-2) 0;
+}
+
+/* 文本输入框 */
+.settings-text-input {
+  width: 100%;
+}
+
+/* ============================================
+   颜色选择器样式
+   ============================================ */
+
+.color-picker-wrapper {
+  /* 布局 */
+  position: relative;
+
+  /* 盒模型 */
+  width: var(--settings-color-picker-size);
+  height: var(--settings-color-picker-size);
+
+  /* 交互 */
+  cursor: pointer;
+}
+
+.color-picker-input {
+  /* 布局 */
+  position: absolute;
+  z-index: 2;
+
+  /* 盒模型 */
+  width: 100%;
+  height: 100%;
+
+  /* 视觉 */
+  opacity: 0;
+
+  /* 交互 */
+  cursor: pointer;
+}
+
+.color-picker-display {
+  /* 布局 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+
+  /* 盒模型 */
+  width: 18px;
+  height: 18px;
+  border-radius: var(--settings-radius-full);
+  border: 2px solid;
+}
+
+.color-picker-outer-ring {
+  /* 布局 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+
+  /* 盒模型 */
+  width: var(--settings-color-picker-ring);
+  height: var(--settings-color-picker-ring);
+  border-radius: var(--settings-radius-full);
+  border: 2px solid;
+
+  /* 视觉 */
+  background: transparent;
+}
+
+.color-picker-wrapper:hover .color-picker-outer-ring {
+  border-width: 3px;
+}
+
+/* 文档目录设置 */
+.settings-documents-dir {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+
+  /* 盒模型 */
+  gap: var(--space-2);
+}
+
+/* ============================================
+   关于页面样式（macOS 原生风格）
+   ============================================ */
+
+.about-native-container {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  
+  /* 盒模型 */
+  padding: var(--space-8);
+  min-height: 100%;
+}
+
+.about-native-content {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  /* 排版 */
+  text-align: center;
+}
+
+.about-native-icon {
+  /* 盒模型 */
+  width: 128px;
+  height: 128px;
+  margin-bottom: var(--space-5);
+  
+  /* 视觉 */
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.about-native-title {
+  /* 排版 */
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--settings-text-primary);
+  letter-spacing: -0.5px;
+  
+  /* 盒模型 */
+  margin: 0 0 var(--space-1) 0;
+}
+
+.about-native-version {
+  /* 排版 */
+  font-size: 13px;
+  color: var(--settings-text-secondary);
+  
+  /* 盒模型 */
+  margin: 0 0 var(--space-6) 0;
+}
+
+.about-native-copyright {
+  /* 排版 */
+  font-size: 11px;
+  color: var(--settings-text-quaternary);
+  line-height: 1.6;
+  
+  /* 盒模型 */
+  margin: 0;
+}
+
+.about-native-rate-btn {
+  /* 盒模型 */
+  margin-top: 0;
+}
+
+.about-native-actions {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+
+  /* 盒模型 */
+  margin-top: var(--space-5);
+}
+
+/* ============================================
+   旧版关于页面样式（保留兼容）
+   ============================================ */
+
+.about-content {
+  /* 盒模型 */
+  padding: var(--space-5) 0;
+
+  /* 排版 */
+  text-align: center;
+}
+
+.about-logo {
+  margin-bottom: var(--space-4);
+}
+
+.about-avatar {
+  /* 盒模型 */
+  width: var(--settings-about-avatar-size);
+  height: var(--settings-about-avatar-size);
+  border-radius: var(--settings-radius-full);
+
+  /* 视觉 */
+  object-fit: cover;
+  box-shadow: var(--settings-shadow-sm);
+}
+
+.about-title {
+  /* 排版 */
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  color: var(--settings-text-primary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-2) 0;
+}
+
+.about-version {
+  /* 排版 */
+  color: var(--settings-text-quaternary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-5) 0;
+}
+
+.about-description {
+  /* 排版 */
+  color: var(--settings-text-secondary);
+  line-height: var(--line-height-base);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-6) 0;
+}
+
+.about-features {
+  /* 排版 */
+  text-align: left;
+
+  /* 盒模型 */
+  padding: var(--space-4) var(--space-5);
+
+  /* 视觉 */
+  background: var(--settings-bg-tertiary);
+  border-radius: var(--settings-radius-xl);
+  border: 1px solid var(--settings-border);
+}
+
+.about-features h4 {
+  /* 排版 */
+  font-weight: var(--font-weight-semibold);
+  color: var(--settings-text-primary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-3) 0;
+}
+
+.about-features ul {
+  /* 盒模型 */
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.about-features li {
+  /* 排版 */
+  color: var(--settings-text-secondary);
+  line-height: 1.8;
+}
+
+/* ============================================
+   隐私条款样式
+   ============================================ */
+
+.privacy-collapse-title {
+  /* 排版 */
+  font-weight: var(--font-weight-semibold);
+  color: var(--settings-text-secondary);
+}
+
+.privacy-section-content {
+  /* 排版 */
+  text-align: left;
+  font-size: var(--font-size-settings);
+  line-height: 1.8;
+  color: var(--settings-text-secondary);
+}
+
+.privacy-section-content h4 {
+  /* 排版 */
+  font-weight: var(--font-weight-semibold);
+  color: var(--settings-text-primary);
+
+  /* 盒模型 */
+  margin: var(--space-4) 0 var(--space-2) 0;
+}
+
+/* ============================================
+   隐私条款简化页面样式
+   ============================================ */
+
+.privacy-simple-container {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  overflow-y: auto;
+
+  /* 盒模型 */
+  padding: var(--space-8);
+}
+
+.privacy-simple-content {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* 盒模型 */
+  width: 100%;
+  max-width: 480px;
+}
+
+.privacy-simple-title {
+  /* 排版 */
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  color: var(--settings-text-primary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-2) 0;
+}
+
+.privacy-simple-subtitle {
+  /* 排版 */
+  font-size: var(--font-size-base);
+  color: var(--settings-text-secondary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-6) 0;
+}
+
+.privacy-simple-card {
+  /* 盒模型 */
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+
+.privacy-simple-list {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  /* 盒模型 */
+  padding: var(--space-4);
+}
+
+.privacy-simple-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.privacy-simple-check {
+  /* 排版 */
+  font-size: 14px;
+  color: var(--success);
+
+  /* 盒模型 */
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 视觉 */
+  background: color-mix(in oklch, var(--success) 15%, transparent);
+}
+
+.privacy-simple-text {
+  /* 排版 */
+  font-size: var(--font-size-base);
+  color: var(--settings-text-primary);
+}
+
+.privacy-view-full-btn {
+  /* 盒模型 */
+  margin-bottom: var(--space-6);
+}
+
+.privacy-simple-contact {
+  /* 排版 */
+  font-size: var(--font-size-sm);
+  color: var(--settings-text-tertiary);
+
+  /* 盒模型 */
+  margin: 0;
+}
+
+/* ============================================
+   SettingsModal 组件样式
+   ============================================ */
+
+.settings-button {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  border: none;
+  border-radius: var(--btn-icon-radius);
+
+  /* 视觉 */
+  background: transparent;
+  color: var(--settings-text-secondary);
+
+  /* 排版 */
+  font-size: var(--font-size-settings-title);
+
+  /* 交互 */
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.settings-button:hover {
+  background: var(--settings-bg-quaternary);
+  color: var(--settings-text-primary);
+}
+
+.settings-button:active {
+  background: var(--settings-bg-tertiary);
+}
+
+/* ============================================
+   ShortcutSettings 组件样式
+   ============================================ */
+
+.shortcut-settings {
+  padding: 0;
+}
+
+/* 快捷键冲突警告 */
+.shortcut-conflicts-warning {
+  /* 盒模型 */
+  padding: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--settings-border);
+  border-radius: var(--settings-radius-md);
+
+  /* 视觉 */
+  background: var(--settings-bg-secondary);
+}
+
+.shortcut-conflicts-warning strong {
+  /* 排版 */
+  color: var(--settings-text-secondary);
+  font-size: var(--font-size-settings-large);
+}
+
+.shortcut-conflicts-warning ul {
+  /* 盒模型 */
+  margin: var(--space-2) 0 0 0;
+  padding-left: var(--space-5);
+}
+
+.shortcut-conflicts-warning li {
+  /* 排版 */
+  color: var(--settings-text-tertiary);
+  font-size: var(--font-size-shortcut);
+
+  /* 盒模型 */
+  margin: var(--space-1) 0;
+}
+
+/* 快捷键分类 */
+.shortcut-categories {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+
+  /* 盒模型 */
+  gap: var(--space-6);
+}
+
+.shortcut-category h4 {
+  /* 排版 */
+  margin: 0 0 var(--space-4) 0;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--settings-border);
+  font-size: var(--font-size-settings-large);
+  font-weight: var(--font-weight-semibold);
+  color: var(--settings-text-secondary);
+}
+
+.shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.shortcut-item {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) 60px minmax(0, 3fr);
+  align-items: center;
+  gap: 16px;
+  padding: 6px 0;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+
+.shortcut-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.shortcut-item.has-conflict {
+  background: var(--settings-error-bg);
+}
+
+.shortcut-conflict-hint {
+  font-size: var(--font-size-settings-small);
+  color: var(--settings-error-text);
+  margin-top: 2px;
+}
+
+.shortcut-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shortcut-name {
+  /* 排版 */
+  font-size: var(--font-size-settings);
+  font-weight: var(--font-weight-medium);
+  color: var(--settings-text-primary);
+}
+
+.shortcut-description {
+  /* 排版 */
+  font-size: var(--font-size-settings-small);
+  color: var(--settings-text-quaternary);
+}
+
+.shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-shortcut);
+  transition: background 0.12s;
+}
+
+.shortcut-key:hover {
+  background: var(--settings-bg-quaternary);
+}
+
+.shortcut-key.is-na {
+  cursor: default;
+}
+
+.shortcut-key.is-na:hover {
+  background: transparent;
+}
+
+.shortcut-tag.is-na {
+  opacity: 0.4;
+}
+
+.shortcut-key.conflict .shortcut-tag {
+  background: var(--settings-error-bg);
+  border-color: var(--settings-error-border);
+  color: var(--settings-error-text);
+}
+
+.shortcut-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid var(--settings-border);
+  border-radius: 4px;
+  background: var(--settings-bg-tertiary);
+  color: var(--settings-text-secondary);
+  box-shadow: var(--settings-shadow-sm);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.shortcut-tag.recording {
+  border-color: var(--sidebar-accent);
+  background: color-mix(in oklch, var(--sidebar-accent) 25%, transparent);
+  color: var(--sidebar-accent-foreground);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--sidebar-accent) 12%, transparent);
+}
+
+.shortcut-tag.conflict,
+.shortcut-tag.conflict-builtin {
+  border-color: color-mix(in oklch, var(--warning) 40%, transparent);
+  background: color-mix(in oklch, var(--warning) 12%, transparent);
+  color: var(--warning);
+}
+
+.shortcut-btn-warning {
+  border-color: color-mix(in oklch, var(--warning) 50%, transparent) !important;
+  color: var(--warning) !important;
+}
+
+/* 未设置的快捷键 */
+.shortcut-not-set {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border: 1px dashed var(--settings-text-quaternary);
+  border-radius: 4px;
+  color: var(--settings-text-quaternary);
+  font-size: var(--font-size-tag);
+  font-weight: 500;
+  opacity: 0.7;
+  transition: all 0.12s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.shortcut-key:hover .shortcut-not-set {
+  border-color: var(--sidebar-accent);
+  color: var(--sidebar-accent);
+  opacity: 1;
+}
+
+/* 快捷键操作按钮（清除/重置） */
+.shortcut-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.shortcut-key.built-in {
+  cursor: default;
+}
+
+.shortcut-key.built-in:hover {
+  background: transparent;
+}
+
+.shortcut-key.built-in .shortcut-tag {
+  cursor: default;
+}
+
+.shortcut-action-btn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--settings-text-quaternary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+  flex-shrink: 0;
+}
+
+.shortcut-item:hover .shortcut-action-btn,
+.shortcut-item:focus-within .shortcut-action-btn {
+  opacity: 0.4;
+}
+
+.shortcut-action-btn:hover {
+  opacity: 1 !important;
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  color: var(--settings-text-primary);
+}
+
+.shortcut-action-btn.placeholder {
+  width: 12px;
+  cursor: default;
+}
+
+.shortcut-action-btn.placeholder:hover {
+  opacity: 0.4 !important;
+  background: transparent;
+}
+
+.shortcut-action-btn.clear:hover {
+  color: var(--destructive);
+}
+
+.shortcut-action-btn.reset {
+  opacity: 1;
+}
+
+.shortcut-action-btn.reset:hover {
+  color: var(--primary);
+}
+
+/* 快捷键设置底部栏 */
+.shortcut-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 16px;
+  margin-top: 12px;
+  border-top: 1px solid var(--settings-border);
+}
+
+.shortcut-settings-footer .shortcut-conflicts-warning {
+  margin-bottom: 0;
+  padding: var(--space-2) var(--space-3);
+  flex: 1;
+  margin-right: var(--space-3);
+}
+
+/* 斜杠命令标签 */
+.slash-command-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 1px solid var(--settings-border);
+  border-radius: 3px;
+  background: var(--settings-bg-tertiary);
+  color: var(--settings-text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-tag);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.slash-command-tag:hover {
+  background: var(--settings-bg-secondary);
+}
+
+.slash-command-tag.copied {
+  background: color-mix(in oklch, var(--success) 20%, transparent);
+  color: var(--success);
+  border-color: color-mix(in oklch, var(--success) 40%, transparent);
+}
+
+.slash-column {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* ============================================
+   鸣谢页面样式 (Acknowledgments) - 简洁版
+   ============================================ */
+
+.acknowledgments-simple-container {
+  /* 布局 */
+  display: flex;
+  justify-content: center;
+
+  /* 盒模型 */
+  padding: var(--space-6) var(--space-4);
+}
+
+.acknowledgments-simple-content {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* 排版 */
+  text-align: center;
+}
+
+.acknowledgments-simple-icon {
+  /* 盒模型 */
+  width: 64px;
+  height: 64px;
+
+  /* 视觉 */
+  object-fit: cover;
+  margin-bottom: var(--space-3);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.acknowledgments-simple-title {
+  /* 排版 */
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--settings-text-primary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-1) 0;
+}
+
+.acknowledgments-simple-subtitle {
+  /* 排版 */
+  font-size: var(--font-size-settings-small);
+  color: var(--settings-text-secondary);
+
+  /* 盒模型 */
+  margin: 0 0 var(--space-4) 0;
+}
+
+.acknowledgments-simple-card {
+  /* 盒模型 */
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: var(--space-4);
+}
+
+.acknowledgments-simple-list {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+
+  /* 盒模型 */
+  padding: 0;
+}
+
+.acknowledgments-simple-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-10);
+
+  /* 盒模型 */
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--settings-border);
+}
+
+.acknowledgments-simple-item:last-child {
+  border-bottom: none;
+}
+
+.acknowledgments-simple-name {
+  /* 排版 */
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-settings);
+  color: var(--settings-text-primary);
+}
+
+.acknowledgments-simple-url {
+  /* 排版 */
+  font-size: var(--font-size-settings-small);
+  color: var(--settings-text-tertiary);
+  font-family: var(--font-family-mono);
+}
+
+.acknowledgments-simple-thanks {
+  /* 排版 */
+  font-size: var(--font-size-settings-small);
+  color: var(--settings-text-secondary);
+
+  /* 盒模型 */
+  margin: 0;
+}
+
+/* 查看完整鸣谢按钮 */
+.acknowledgments-view-full-btn {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+/* ============================================
+   小窗口通用样式（鸣谢/隐私）
+   ============================================ */
+
+.window-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.window-content {
+  flex: 1;
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.window-content .markdown-editor {
+  height: 100%;
+}
+
+/* 编辑器内容区域 - 使用移动端适配边距（350px < 768px） */
+.window-content .ProseMirror {
+  padding: 20px 30px !important;
+  max-width: none !important;
+}
+
+.window-footer {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--sidebar);
+  border-top: 1px solid var(--border);
+}
+
+.window-hint {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+  text-align: center;
+  margin: 0;
+}
+
+/* 自定义标题栏 */
+.window-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: var(--titlebar-height);
+  padding: 0 4px;
+  background-color: var(--background);
+}
+
+.window-titlebar-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 80px;
+  -webkit-app-region: no-drag;
+}
+
+.window-titlebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.window-titlebar-btn:hover {
+  background-color: var(--secondary);
+  color: var(--foreground);
+}
+
+.window-titlebar-btn:active {
+  background-color: var(--secondary-foreground);
+}
+
+.window-titlebar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-size: var(--titlebar-font-size);
+  font-family: var(--font-family-base);
+  color: var(--titlebar-text-secondary);
+  cursor: default;
+  user-select: none;
+}
+
+.window-titlebar-spacer {
+  width: 80px;
+}
+
+.window-loading {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 盒模型 */
+  height: 100vh;
+
+  /* 视觉 */
+  background-color: var(--background);
+}
+
+.window-spinner {
+  /* 盒模型 */
+  width: 32px;
+  height: 32px;
+
+  /* 视觉 */
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: window-spin 0.8s linear infinite;
+}
+
+@keyframes window-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   设置内容淡入动画
+   ============================================ */
+.settings-content-fade-in {
+  animation: settingsFadeIn 0.3s ease-out;
+}
+
+@keyframes settingsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================
+   卡片标题规格修正（对齐 Apple HIG 15px Semibold）
+   ============================================ */
+
+.settings-content [data-slot="card-title"] {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.settings-content [data-slot="card-content"],
+.settings-content [data-slot="card"] {
+  font-weight: 400;
+}
+
+/* ============================================
+   设置页面 Select 组件样式
+   ============================================ */
+
+/* ============================================
+   第三方 AI 服务同意对话框
+   ============================================ */
+.ai-consent-dialog {
+  display: flex;
+  flex-direction: column;
+  max-width: min(400px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ai-consent-stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px 0;
+}
+
+.ai-consent-step {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+
+.ai-consent-progress {
+  display: flex;
+  flex: 1;
+  max-width: 88px;
+  gap: 4px;
+}
+
+.ai-consent-progress > span {
+  display: block;
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.ai-consent-progress > span.is-done {
+  background: var(--foreground);
+}
+
+.ai-consent-title {
+  padding: 12px 18px 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ai-consent-subtitle {
+  padding: 5px 18px 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+.ai-consent-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 18px 0;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.ai-consent-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-consent-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+
+.ai-consent-recipients {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.ai-consent-recipients li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11.5px;
+}
+
+.ai-consent-recipients li:last-child {
+  border-bottom: none;
+}
+
+.ai-consent-recipients a {
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.ai-consent-recipients a:hover {
+  color: var(--foreground);
+  text-decoration: underline;
+}
+
+.ai-consent-text {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.ai-consent-note {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.ai-consent-control {
+  margin: 0;
+  padding: 10px 11px;
+  border-radius: 9px;
+  background: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+.ai-consent-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.ai-consent-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.ai-consent-check [data-slot='checkbox'] {
+  margin-top: 2px;
+}
+
+.ai-consent-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 18px;
+}
+
+/* ============================================
+   模型设置：总开关 / 配置列表 / 内联表单
+   ============================================ */
+
+.ai-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.ai-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.ai-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ai-profile-form {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.ai-profile-form label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.ai-profile-field {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.ai-profile-field-label {
+  color: var(--foreground);
+}
+
+.ai-profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ai-provider-unavailable {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--warning) 12%, transparent);
+  color: var(--warning);
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.ai-profile-confirm {
+  font-size: 12px;
+  color: var(--destructive);
+}

@@ -1,0 +1,198 @@
+[
+  {
+    "src": "plain",
+    "out": [
+      "plain"
+    ]
+  },
+  {
+    "src": "a *b* c **d** ~~e~~",
+    "out": [
+      "a *b* c **d** ~~e~~"
+    ]
+  },
+  {
+    "src": "a  \nb",
+    "out": [
+      "a  \nb"
+    ]
+  },
+  {
+    "src": "a\\\nb",
+    "out": [
+      "a\\\nb"
+    ]
+  },
+  {
+    "src": "a\nb",
+    "out": [
+      "a\nb"
+    ]
+  },
+  {
+    "src": "`c`",
+    "out": [
+      "`c`"
+    ]
+  },
+  {
+    "src": "``a`b``",
+    "out": [
+      "``a`b``"
+    ]
+  },
+  {
+    "src": "a `c` b",
+    "out": [
+      "a `c` b"
+    ]
+  },
+  {
+    "src": "[t](u)",
+    "out": [
+      "[t](u)"
+    ]
+  },
+  {
+    "src": "[t](u \"ti\")",
+    "out": [
+      "[t](u \"ti\")"
+    ]
+  },
+  {
+    "src": "[](u)",
+    "out": [
+      "[](u)"
+    ]
+  },
+  {
+    "src": "[t][id]",
+    "out": [
+      "[t][id]"
+    ]
+  },
+  {
+    "src": "[t][]",
+    "out": [
+      "[t][]"
+    ]
+  },
+  {
+    "src": "[t]",
+    "out": [
+      "[t]"
+    ]
+  },
+  {
+    "src": "![a](x.png)",
+    "out": [
+      "![a](x.png)"
+    ]
+  },
+  {
+    "src": "![a](x.png \"ti\")",
+    "out": [
+      "![a](x.png \"ti\")"
+    ]
+  },
+  {
+    "src": "![a][id]",
+    "out": [
+      "![a][id]"
+    ]
+  },
+  {
+    "src": "![a][]",
+    "out": [
+      "![a][]"
+    ]
+  },
+  {
+    "src": "<https://a.b/~x~>",
+    "out": [
+      "<https://a.b/~x~>"
+    ]
+  },
+  {
+    "src": "a :smile: b",
+    "out": [
+      "a :smile: b"
+    ]
+  },
+  {
+    "src": "$x^2$",
+    "out": [
+      "$x^2$"
+    ]
+  },
+  {
+    "src": "\\(y\\)",
+    "out": [
+      "\\(y\\)"
+    ]
+  },
+  {
+    "src": "~a\\ b~",
+    "out": [
+      "~a\\ b~"
+    ]
+  },
+  {
+    "src": "~a\\:smile:~",
+    "out": [
+      "~a\\:smile:~"
+    ]
+  },
+  {
+    "src": "a \\* b",
+    "out": [
+      "a \\* b"
+    ]
+  },
+  {
+    "src": "a\\\\ b",
+    "out": [
+      "a\\\\ b"
+    ]
+  },
+  {
+    "src": "==x==",
+    "out": [
+      "==x=="
+    ]
+  },
+  {
+    "src": "H~2~O E=mc^2^",
+    "out": [
+      "H~2~O E=mc^2^"
+    ]
+  },
+  {
+    "src": "[id]: https://x.example \"ti\"",
+    "out": []
+  },
+  {
+    "src": "see [t][id] and ![a][id]\n\n[id]: https://x.example \"ti\"",
+    "out": [
+      "see [t](https://x.example \"ti\") and ![a](https://x.example \"ti\")"
+    ]
+  },
+  {
+    "src": "[full][id] and [collapsed][] and [shortcut]\n\n[id]: https://i.example \"ti\"\n[collapsed]: https://c.example\n[shortcut]: https://s.example",
+    "out": [
+      "[full](https://i.example \"ti\") and [collapsed](https://c.example) and [shortcut](https://s.example)"
+    ]
+  },
+  {
+    "src": "[][empty]\n\n[empty]: https://e.example",
+    "out": [
+      "[](https://e.example)"
+    ]
+  },
+  {
+    "src": "![alt][img] and ![a &amp; b][img]\n\n[img]: https://i.example \"ti\"",
+    "out": [
+      "![alt](https://i.example \"ti\") and ![a &amp; b](https://i.example \"ti\")"
+    ]
+  }
+]

@@ -1,0 +1,37 @@
+/* ColorArea thumb */
+[data-rac][role="group"] > [role="img"] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+[data-rac][role="group"] > [role="img"] [role="slider"] {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* ColorField input */
+[data-rac] input {
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 11px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+[data-rac] input:focus {
+  border-color: var(--ring, #3b82f6);
+  box-shadow: 0 0 0 1px var(--ring, #3b82f6);
+}

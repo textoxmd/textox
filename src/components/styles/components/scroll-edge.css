@@ -1,0 +1,38 @@
+/* ============================================
+   滚动边缘渐隐（参考 macOS 26 的 scroll edge effect）
+   ============================================ */
+
+/* 渐隐层覆盖在内容之上，由父级（不滚动的定位容器）承载，
+   放在滚动容器内部会跟随内容一起滚动。 */
+.scroll-edge {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: 24px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.scroll-edge.is-visible {
+  opacity: 1;
+}
+
+.scroll-edge-top {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--scroll-edge-color, var(--sidebar)),
+    transparent
+  );
+}
+
+.scroll-edge-bottom {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    var(--scroll-edge-color, var(--sidebar)),
+    transparent
+  );
+}

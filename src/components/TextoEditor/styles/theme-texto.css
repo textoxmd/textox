@@ -1,0 +1,133 @@
+/*
+ * Typora-flavored content theme — adapted for Textox theme system.
+ * Scoped under .texto-editor.
+ */
+
+.texto-editor .ProseMirror {
+  font-family: var(--editor-font-family-base);
+  font-size: var(--font-size-editor);
+  line-height: var(--line-height-editor);
+  color: var(--editor-text-primary);
+  word-wrap: break-word;
+}
+
+.texto-editor .ProseMirror h1,
+.texto-editor .ProseMirror h2,
+.texto-editor .ProseMirror h3,
+.texto-editor .ProseMirror h4,
+.texto-editor .ProseMirror h5,
+.texto-editor .ProseMirror h6 {
+  margin: 1.6em 0 0.8em;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading);
+  color: var(--editor-text-primary);
+}
+.texto-editor .ProseMirror > :first-child { margin-top: 0; }
+.texto-editor .ProseMirror h1 { font-size: var(--font-size-editor-h1); }
+.texto-editor .ProseMirror h2 { font-size: var(--font-size-editor-h2); }
+.texto-editor .ProseMirror h3 { font-size: var(--font-size-editor-h3); }
+.texto-editor .ProseMirror h4 { font-size: var(--font-size-editor-h4); }
+.texto-editor .ProseMirror h5 { font-size: var(--font-size-editor-h5); }
+.texto-editor .ProseMirror h6 { font-size: var(--font-size-editor-h6); color: var(--editor-text-tertiary); }
+
+.texto-editor .ProseMirror p { margin: 0 0 1em; }
+.texto-editor .ProseMirror p:last-child { margin-bottom: 0; }
+
+.texto-editor .ProseMirror a {
+  color: var(--editor-link-color);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--editor-link-color) 25%, transparent);
+}
+.texto-editor .ProseMirror a:hover {
+  border-bottom-color: var(--editor-link-color);
+}
+
+.texto-editor .ProseMirror code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-editor);
+  padding: 0.15em 0.35em;
+  margin: 0;
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  border-radius: var(--radius-md);
+  white-space: break-spaces;
+}
+.texto-editor .ProseMirror pre {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-editor);
+  line-height: var(--line-height-code);
+  background: var(--editor-code-bg);
+  padding: 12px 14px;
+  margin: 0 0 1em;
+  border-radius: var(--radius-lg);
+  overflow: visible;
+  border: 1px solid var(--border);
+}
+.texto-editor .ProseMirror pre code {
+  display: block;
+  overflow: auto;
+  max-height: 600px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: 0;
+  font-size: 100%;
+  white-space: pre;
+}
+.texto-editor.code-block-word-wrap .ProseMirror pre code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.texto-editor .ProseMirror blockquote {
+  margin: 0 0 1em;
+  padding: 0 0 0 1em;
+  color: var(--editor-blockquote-text);
+  border-left: 3px solid var(--editor-blockquote-border);
+}
+.texto-editor .ProseMirror blockquote > :first-child { margin-top: 0; }
+.texto-editor .ProseMirror blockquote > :last-child { margin-bottom: 0; }
+
+.texto-editor .ProseMirror ul {
+  margin: 0 0 1em;
+  padding-left: 1.6em;
+  list-style-type: disc;
+}
+.texto-editor .ProseMirror ol {
+  margin: 0 0 1em;
+  padding-left: 1.6em;
+  list-style-type: decimal;
+}
+.texto-editor .ProseMirror ul ul,
+.texto-editor .ProseMirror ul ol,
+.texto-editor .ProseMirror ol ul,
+.texto-editor .ProseMirror ol ol { margin-bottom: 0; }
+.texto-editor .ProseMirror li > p { margin-bottom: 0; }
+
+/* 任务列表样式：隐藏包含 checkbox-frame（task_marker 的 NodeView）的 li 的圆点 */
+.texto-editor .ProseMirror li:has(> p > span.checkbox-frame) {
+  list-style: none;
+}
+
+
+
+.texto-editor .ProseMirror hr {
+  height: 1px;
+  padding: 0;
+  margin: 1.6em 0;
+  background: var(--editor-hr-bg);
+  border: 0;
+}
+
+.texto-editor .ProseMirror table th,
+.texto-editor .ProseMirror table td {
+  padding: 6px 10px;
+  border: 1px solid var(--editor-table-border);
+  vertical-align: top;
+}
+.texto-editor .ProseMirror table th {
+  font-weight: var(--font-weight-semibold);
+  background: var(--editor-table-header-bg);
+  text-align: left; /* 无显式对齐的表头左对齐（显式对齐由内联 style 覆盖） */
+}
+
+.texto-editor .ProseMirror del { color: inherit; }

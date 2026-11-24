@@ -1,0 +1,230 @@
+/**
+ * 行内样式插件样式
+ * 包含粗体、斜体、行内代码、删除线、链接、公式
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     基础颜色
+     ------------------------------------------ */
+  --inline-text-primary: var(--foreground);
+  --inline-text-muted: var(--muted-foreground);
+  --inline-text-link: var(--editor-text-secondary);
+  --inline-bg-code: var(--muted);
+  --inline-code-text: var(--foreground);
+
+  /* ------------------------------------------
+     排版
+     ------------------------------------------ */
+  --inline-font-weight-bold: 700;
+  --inline-font-weight-normal: 400;
+  --inline-font-size-code: 0.9em;
+
+  /* ------------------------------------------
+     尺寸与间距
+     ------------------------------------------ */
+  --inline-code-padding-x: 4px;
+  --inline-code-padding-y: 2px;
+  --inline-code-border-radius: 3px;
+
+  /* ------------------------------------------
+     状态
+     ------------------------------------------ */
+  --inline-marker-opacity: 0.5;
+}
+
+/* ============================================
+   粗体样式
+   ============================================ */
+
+.bold-content {
+  /* 排版 */
+  font-weight: var(--inline-font-weight-bold);
+}
+
+.bold-marker {
+  /* 视觉 */
+  color: var(--inline-text-muted);
+  opacity: var(--inline-marker-opacity);
+
+  /* 排版 */
+  font-weight: var(--inline-font-weight-normal);
+}
+
+.bold-marker-hidden {
+  /* 布局 */
+  display: none;
+}
+
+/* ============================================
+   斜体样式
+   ============================================ */
+
+.italic-content {
+  /* 排版 */
+  font-style: italic;
+}
+
+.italic-marker {
+  /* 视觉 */
+  color: var(--inline-text-muted);
+  opacity: var(--inline-marker-opacity);
+
+  /* 排版 */
+  font-style: normal;
+}
+
+.italic-marker-hidden {
+  /* 布局 */
+  display: none;
+}
+
+/* ============================================
+   行内代码样式
+   ============================================ */
+
+.inline-code-content {
+  /* 盒模型 */
+  padding: var(--inline-code-padding-y) var(--inline-code-padding-x);
+  border-radius: var(--inline-code-border-radius);
+
+  /* 视觉 */
+  background-color: var(--inline-bg-code);
+  color: var(--inline-code-text);
+
+  /* 排版 */
+  font-family: var(--font-family-mono);
+  font-size: var(--inline-font-size-code);
+}
+
+.inline-code-backtick {
+  /* 视觉 */
+  color: var(--inline-text-muted);
+  opacity: var(--inline-marker-opacity);
+
+  /* 排版 */
+  font-family: var(--font-family-mono);
+}
+
+.inline-code-backtick-hidden {
+  /* 布局 */
+  display: none;
+}
+
+/* ============================================
+   删除线样式
+   ============================================ */
+
+.strikethrough-content {
+  /* 视觉 */
+  text-decoration: line-through;
+}
+
+.strikethrough-marker {
+  /* 视觉 */
+  color: var(--inline-text-muted);
+  opacity: var(--inline-marker-opacity);
+}
+
+.strikethrough-marker-hidden {
+  /* 布局 */
+  display: none !important;
+}
+
+/* ============================================
+   链接样式
+   ============================================ */
+
+.link-content {
+  /* 视觉 */
+  color: var(--inline-text-link);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  /* 交互 */
+  cursor: pointer;
+}
+
+/* 链接文本部分（无下划线） */
+.link-text {
+  /* 视觉 */
+  color: var(--inline-text-link);
+  text-decoration: none;
+
+  /* 交互 */
+  cursor: pointer;
+}
+
+/* 链接 URL 部分（有下划线） */
+.link-url {
+  /* 视觉 */
+  color: var(--inline-text-link);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  /* 交互 */
+  cursor: pointer;
+}
+
+.link-marker {
+  /* 视觉 */
+  color: var(--inline-text-muted);
+  opacity: var(--inline-marker-opacity);
+}
+
+.link-marker-hidden {
+  /* 布局 */
+  display: none;
+}
+
+/* ============================================
+   行内公式样式
+   ============================================ */
+
+.math-marker {
+  /* 视觉 */
+  color: var(--inline-text-muted);
+  opacity: var(--inline-marker-opacity);
+}
+
+.math-marker-hidden {
+  /* 布局 */
+  display: none;
+}
+
+/* 原始公式内容隐藏（显示渲染后的 SVG 替代） */
+.math-content-hidden {
+  /* 布局 */
+  display: none;
+}
+
+/* 公式渲染容器 */
+math-jax {
+  /* 布局 */
+  display: inline-block;
+
+  /* 视觉 */
+  color: var(--inline-text-primary);
+  opacity: 1;
+
+  /* 排版 */
+  font-family: var(--font-family-math);
+  font-style: italic;
+}
+
+/* 渲染后的公式 */
+math-jax svg {
+  /* 布局 */
+  display: inline-block !important;
+  /* 不覆盖 MathJax 内联的 vertical-align，让公式基线随 glyph 自动对齐 */
+  vertical-align: middle;
+
+  /* 视觉 */
+  /* visibility: visible !important; */
+  /* 限制最大高度为 1.2 倍行高，避免异常尺寸公式破坏排版 */
+  /* max-height: 1.2em; */
+}

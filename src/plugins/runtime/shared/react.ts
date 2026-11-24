@@ -1,0 +1,38 @@
+// `react` 是 CJS（`export =`）模块：构建期 `export *` 只会保留 default，
+// 必须显式列出具名导出，import map 指向的 chunk 才能被插件 `import { useState }` 使用。
+// 新增导出请同步更新 `__tests__/sharedExports.test.ts` 的漂移守卫。
+export {
+  Children,
+  Component,
+  Fragment,
+  Profiler,
+  PureComponent,
+  StrictMode,
+  Suspense,
+  cloneElement,
+  createContext,
+  createElement,
+  createRef,
+  forwardRef,
+  isValidElement,
+  lazy,
+  memo,
+  startTransition,
+  useCallback,
+  useContext,
+  useDebugValue,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useInsertionEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+  version,
+} from 'react';
+export { default } from 'react';

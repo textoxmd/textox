@@ -1,0 +1,201 @@
+/* ============================================
+   CSS 变量定义 - 按元素分类
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     基础颜色
+     ------------------------------------------ */
+  --editor-text-primary: var(--foreground);
+  --editor-text-secondary: var(--muted-foreground);
+  --editor-text-tertiary: var(--muted-foreground);
+  --editor-link-color: var(--editor-text-secondary);
+  --editor-inline-link: var(--editor-text-secondary);
+
+  /* ------------------------------------------
+     代码块
+     ------------------------------------------ */
+  --editor-code-bg: var(--muted);
+  --editor-code-text: var(--foreground);
+  --editor-code-border-radius: var(--radius-md);
+  --editor-pre-bg: var(--muted);
+  --editor-pre-border-radius: var(--radius-lg);
+  /* 代码块右下角语言选择器相对代码块底部的下沉距离（widgets.css 的 .cb-chrome 用它定位）。 */
+  --editor-pre-chrome-offset: 35px;
+  /* 代码块下方间距：必须 ≥ 选择器下沉距离，否则选择器会与下一个节点重叠，留 5px 余量。 */
+  --editor-pre-margin-bottom: calc(var(--editor-pre-chrome-offset) + 5px);
+
+  /* ------------------------------------------
+     引用块
+     ------------------------------------------ */
+  --editor-blockquote-text: var(--muted-foreground);
+  --editor-blockquote-border: var(--border);
+
+  /* ------------------------------------------
+     表格
+     ------------------------------------------ */
+  --editor-table-border: var(--border);
+  --editor-table-header-bg: var(--muted);
+  --editor-table-row-hover: var(--accent);
+
+  /* ------------------------------------------
+     分隔线
+     ------------------------------------------ */
+  --editor-hr-bg: var(--border);
+
+  /* ------------------------------------------
+     图片
+     ------------------------------------------ */
+  --editor-image-max-height: 400px;
+
+  /* ------------------------------------------
+     列表
+     ------------------------------------------ */
+
+  /* ------------------------------------------
+     布局
+     ------------------------------------------ */
+  --editor-max-width: 900px;
+  --editor-max-width-sm: 600px;
+
+}
+
+/**
+ * 编辑器内容基础样式
+ * 定义 #writer 内的 Markdown 渲染样式
+ * 使用 CSS 变量，由主题文件定义具体值
+ */
+
+#writer > :first-child { margin-top: 0; }
+
+/* #writer 落在 markdown 内容区（MarkdownEditor 根节点）；文件类型编辑器渲染在
+   独立的通用槽位中，二者互不包含，这些规则不会泄漏进文件类型编辑器。
+   主题文件（含自定义主题）以同特异性 `#writer h1 {...}` 覆写标题等颜色时，
+   因后注入而同特异性胜出。 */
+#writer {
+  h1, h2, h3, h4, h5, h6 {
+    margin: 1em 0 0.8em;
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-heading);
+    color: var(--editor-text-primary);
+  }
+
+  h1 { font-size: var(--font-size-editor-h1); }
+  h2 { font-size: var(--font-size-editor-h2); }
+  h3 { font-size: var(--font-size-editor-h3); }
+  h4 { font-size: var(--font-size-editor-h4); }
+  h5 { font-size: var(--font-size-editor-h5); }
+  h6 {
+    font-size: var(--font-size-editor-h6);
+    color: var(--editor-text-tertiary);
+  }
+
+  p {
+    margin: 0 0 1em;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  a {
+    color: var(--editor-link-color);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklch, var(--editor-link-color) 25%, transparent);
+  }
+
+  a:hover {
+    border-bottom-color: var(--editor-link-color);
+  }
+
+  code {
+    font-family: var(--font-family-mono);
+    font-size: 0.85em;
+    padding: 0.15em 0.35em;
+    background: color-mix(in oklch, var(--foreground) 4%, transparent);
+    border-radius: var(--radius-md);
+    white-space: break-spaces;
+  }
+
+  pre {
+    font-family: var(--font-family-mono);
+    font-size: calc(var(--font-size-editor) * 0.85);
+    line-height: var(--line-height-code);
+    padding: 12px 14px;
+    margin: 0 0 var(--editor-pre-margin-bottom);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: visible;
+  }
+
+  pre code {
+    display: block;
+    overflow: auto;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    font-size: 100%;
+    white-space: pre;
+  }
+
+  blockquote {
+    margin: 0 0 1em;
+    padding: 0 0 0 1em;
+    color: var(--editor-blockquote-text);
+    border-left: 3px solid var(--border);
+  }
+
+  blockquote > :first-child { margin-top: 0; }
+  blockquote > :last-child { margin-bottom: 0; }
+
+  ul {
+    margin: 0 0 1em;
+    padding-left: 1.6em;
+    list-style-type: disc;
+  }
+
+  ol {
+    margin: 0 0 1em;
+    padding-left: 1.6em;
+    list-style-type: decimal;
+  }
+
+  ul ul, ul ol, ol ul, ol ol {
+    margin-bottom: 0;
+  }
+
+  li > p {
+    margin-bottom: 0;
+  }
+
+  li:has(> p > span.checkbox-frame) {
+    list-style: none;
+  }
+
+  hr {
+    /* 扩大命中区：margin 改由 padding 承担，上下约 0.75em 内均可点击选中；
+       content-box 覆盖 Tailwind preflight 的 border-box，background-clip 保持细线。 */
+    box-sizing: content-box;
+    height: 1.5px;
+    padding: 0.6em 0;
+    margin: 1.6em 0;
+    background: var(--editor-hr-bg);
+    background-clip: content-box;
+    border: 0;
+  }
+
+  table th, table td {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  table th {
+    font-weight: var(--font-weight-semibold);
+    background: var(--md-grid-header-bg, var(--editor-table-header-bg));
+  }
+
+  del {
+    color: inherit;
+  }
+}

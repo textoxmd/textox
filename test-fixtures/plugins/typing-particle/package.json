@@ -1,0 +1,19 @@
+{
+  "name": "@texto/plugin-typing-particle",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@texto/app-api": "workspace:*",
+    "@texto/markdown-editor-api": "workspace:*",
+    "@texto/plugin-sdk": "workspace:*",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-view": "^1.41.6"
+  }
+}

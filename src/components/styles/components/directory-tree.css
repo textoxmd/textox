@@ -1,0 +1,1158 @@
+/**
+ * DirectoryTree 组件样式
+ * 包含侧边栏容器、标题栏、目录树、大纲面板、右键菜单
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+:root {
+  /* ------------------------------------------
+     尺寸与间距
+     ------------------------------------------ */
+  --directory-tree-base-unit: 1rem;
+  --directory-tree-header-height: var(--sidebar-header-height);
+  --directory-tree-collapsed-width: var(--sidebar-collapsed-width);
+  --directory-tree-item-padding-x: var(--space-4);
+  --directory-tree-item-padding-y: var(--space-1);
+  --directory-tree-content-padding-x: var(--space-2);
+
+  /* ------------------------------------------
+     字体排版
+     ------------------------------------------ */
+  --directory-tree-font-size-title: var(--font-size-sidebar-title);
+  --directory-tree-font-size-header: var(--font-size-sidebar-header);
+  --directory-tree-font-size-item: var(--font-size-sidebar-item);
+  --directory-tree-font-size-small: var(--font-size-sidebar-small);
+  --directory-tree-font-weight-normal: var(--font-weight-normal);
+  --directory-tree-font-weight-medium: var(--font-weight-medium);
+  --directory-tree-font-weight-semibold: var(--font-weight-semibold);
+
+  /* ------------------------------------------
+     图标尺寸
+     ------------------------------------------ */
+  --directory-tree-icon-size-sm: 8px;
+  --directory-tree-icon-size-md: 15px;
+  --directory-tree-icon-size-lg: 16px;
+
+  /* ------------------------------------------
+     交互状态 - 使用 index.css 标准变量
+     ------------------------------------------ */
+  --directory-tree-hover-bg: color-mix(in oklch, var(--sidebar-accent) 70%, var(--sidebar));
+  --directory-tree-selected-bg: var(--sidebar-accent);
+  --directory-tree-transition-fast: var(--transition-fast);
+  --directory-tree-transition-normal: var(--transition-normal);
+}
+
+/* ============================================
+   侧边栏容器
+   ============================================ */
+
+/* 主容器 */
+.directory-tree {
+  /* 布局 */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  flex-shrink: 0;
+
+  /* 盒模型 */
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  margin: 0 !important;
+  border: none;
+  /* border-right: 1px solid var(--sidebar-border); */
+  border-radius: var(--radius-none);
+
+  /* 视觉样式 */
+  /* 背景由父容器 .sidebar-area 统一持有，保证与全局同步过渡 */
+  box-shadow: none;
+
+  /* 交互 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* 折叠状态 */
+.directory-tree.collapsed {
+  align-items: center;
+  width: var(--directory-tree-collapsed-width);
+  min-width: var(--directory-tree-collapsed-width);
+  padding-top: var(--space-3);
+}
+
+.directory-tree.collapsed .toggle-sidebar-btn {
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+}
+
+/* 调整大小手柄 */
+.sidebar-area .resize-handle {
+  position: absolute;
+  right: 0;
+  left: auto;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background-color: transparent !important;
+  z-index: 10;
+}
+
+.sidebar-area .resize-handle.left {
+  right: auto;
+  left: 0;
+}
+
+body.is-resizing {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+/* ============================================
+   标题栏
+   ============================================ */
+
+/* 标题栏容器 */
+.sidebar-title-bar {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+
+  /* 盒模型 */
+  height: var(--directory-tree-header-height);
+  padding: 0;
+
+  /* 视觉样式 */
+  /* 直接使用 --sidebar 确保与全局同步过渡 */
+  background-color: var(--sidebar);
+
+  /* 交互 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  /* 继承全局颜色过渡 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+/* 标题栏左侧 */
+.sidebar-title-left {
+  flex: 0 0 70px;
+  min-width: 70px;
+  height: 100%;
+}
+
+/* 标题栏中间 */
+.sidebar-title-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+
+/* 标题文本 */
+.sidebar-title-text {
+  /* 排版 */
+  font-size: var(--directory-tree-font-size-title);
+  font-weight: var(--directory-tree-font-weight-semibold);
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* 交互 */
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* 标题栏右侧 */
+.sidebar-title-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 40px;
+  min-width: 40px;
+  height: 100%;
+  padding-right: var(--space-xs);
+}
+
+/* 折叠按钮 */
+.sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  padding: var(--btn-icon-padding);
+}
+
+.sidebar-collapse-icon {
+  width: var(--directory-tree-icon-size-lg);
+  height: var(--directory-tree-icon-size-lg);
+  opacity: 0.6;
+  transition: opacity var(--directory-tree-transition-normal);
+}
+
+.sidebar-collapse-btn:hover .sidebar-collapse-icon {
+  opacity: 1;
+}
+
+/* ============================================
+   树形头部
+   ============================================ */
+
+/* 头部容器 */
+.tree-header {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  /* 盒模型 */
+  min-height: var(--directory-tree-header-height);
+  padding: 0;
+  box-sizing: border-box;
+
+  /* 视觉样式 */
+  /* 背景由父容器 .sidebar-area 统一持有 */
+
+  /* 排版 */
+  font-size: var(--directory-tree-font-size-title);
+  font-weight: var(--directory-tree-font-weight-semibold);
+  color: var(--muted-foreground);
+
+  /* 交互 */
+  user-select: none;
+  /* 文字颜色跟随全局主题过渡 */
+  transition: color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+/* 分段控件式头部 */
+.tree-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  margin: 6px 0;
+  padding: 0 12px;
+}
+
+.tree-tabs-group {
+  display: flex;
+  width: max-content;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: visible;
+  background: var(--muted);
+}
+
+.tree-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 3px 10px;
+  /* 颜色过渡跟随全局主题切换，避免与背景 0.25s 不同步（含分隔线边框） */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              border-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+  white-space: nowrap;
+  position: relative;
+  flex: 1;
+}
+
+.tree-tab:first-child {
+  border-radius: 5px 0 0 5px;
+}
+
+.tree-tab:last-child {
+  border-radius: 0 5px 5px 0;
+}
+
+.tree-tab + .tree-tab {
+  border-left: 1px solid var(--border);
+}
+
+.tree-tab:hover:not(:disabled) {
+  color: var(--foreground);
+}
+
+.tree-tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tree-tab.active {
+  background: var(--background);
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.tree-tab span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
+/* 选择信息栏 */
+.selection-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--sidebar-accent);
+  border-top: 1px solid var(--sidebar-border);
+  font-size: var(--directory-tree-font-size-small);
+}
+
+.selection-count {
+  color: var(--muted-foreground);
+}
+
+.clear-selection-btn {
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-size: var(--directory-tree-font-size-small);
+  cursor: pointer;
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.clear-selection-btn:hover {
+  background-color: var(--sidebar-accent);
+}
+
+/* ============================================
+   树形内容区
+   ============================================ */
+
+/* 侧边栏标签面板容器（淡入淡出切换） */
+.sidebar-tab-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-tab-panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-tab-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tree-content {
+  /* 布局 */
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+
+  /* 盒模型 */
+  padding: 0 var(--directory-tree-content-padding-x) var(--space-4);
+  box-sizing: border-box;
+
+  /* 视觉样式 */
+  /* 背景由父容器 .sidebar-area 统一持有 */
+
+  /* 交互 */
+  user-select: none;
+}
+
+/* ============================================
+    树形节点
+   ============================================ */
+
+/* 节点容器 */
+.tree-node {
+  margin: 0;
+  user-select: none;
+}
+
+/* 最后一个树节点添加底部间距 */
+.tree-content > .tree-node:last-child {
+  margin-bottom: var(--space-4);
+}
+
+/* 树项 */
+.tree-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  /* 盒模型 */
+  padding: var(--directory-tree-item-padding-y) var(--directory-tree-item-padding-x);
+  margin: 0;
+  border-radius: var(--radius-md);
+
+  /* 视觉样式 */
+  color: var(--muted-foreground);
+
+  /* 交互 */
+  cursor: pointer;
+  /* 去掉颜色过渡确保选中态切换即时 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  /* 点击动画优化 */
+  position: relative;
+  overflow: hidden;
+}
+
+.tree-item:hover {
+  background-color: color-mix(in oklch, var(--directory-tree-hover-bg) 40%, transparent);
+}
+
+.directory-tree:focus {
+  outline: none;
+}
+
+.tree-item.selected {
+  background-color: var(--directory-tree-selected-bg);
+  color: var(--foreground) !important;
+  border-radius: var(--radius-md);
+  padding-right: calc(var(--directory-tree-item-padding-x) + 22px);
+}
+
+.directory-tree:focus-within .tree-item.focused {
+  background-color: var(--directory-tree-hover-bg);
+}
+
+.directory-tree:focus-within .tree-item.selected.focused {
+  background-color: var(--directory-tree-selected-bg);
+}
+
+.tree-item-disabled {
+  cursor: default !important;
+}
+
+.tree-item-disabled:hover {
+  background-color: transparent;
+}
+
+.tree-item-disabled::after {
+  display: none;
+}
+
+.tree-item-disabled .file-icon,
+.tree-item-disabled .file-name,
+.tree-item-disabled .file-ext-tag,
+.tree-item-disabled .expand-arrow {
+  opacity: 0.4;
+}
+
+/* 点击波纹效果 */
+.tree-item::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, color-mix(in oklch, var(--sidebar-accent) 50%, transparent) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s ease-out, height 0.15s ease-out, opacity 0.15s ease-out;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tree-item:active::after {
+  width: 120%;
+  height: 200%;
+  opacity: 1;
+}
+
+.tree-item.selected .file-icon,
+.tree-item.selected .file-name {
+  color: var(--foreground) !important;
+}
+
+/* 展开/折叠箭头 */
+.expand-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--directory-tree-icon-size-md);
+  height: var(--directory-tree-icon-size-md);
+  margin-right: 0;
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+  cursor: pointer;
+  user-select: none;
+}
+
+.expand-arrow:hover {
+  color: var(--muted-foreground);
+}
+
+.expand-arrow.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.expand-arrow.disabled:hover {
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+}
+
+.expand-arrow svg {
+  width: 12px;
+  height: 12px;
+}
+
+.expand-arrow.expanded svg {
+  transform: rotate(90deg);
+}
+
+/* 大纲无子节点时的圆点大小 */
+.expand-arrow.dot svg {
+  width: 4px;
+  height: 4px;
+}
+
+/* 设置了 Finder 标签颜色的文件/文件夹用彩色圆点，稍大以便辨识 */
+.expand-arrow.dot.tagged svg {
+  width: 6px;
+  height: 6px;
+}
+
+/* Finder 标签颜色（浅色外观，取自 macOS 系统色） */
+.expand-arrow[data-tag-color='red'] { --tag-color: #ff3b30; }
+.expand-arrow[data-tag-color='orange'] { --tag-color: #ff9500; }
+.expand-arrow[data-tag-color='yellow'] { --tag-color: #ffcc00; }
+.expand-arrow[data-tag-color='green'] { --tag-color: #34c759; }
+.expand-arrow[data-tag-color='blue'] { --tag-color: #007aff; }
+.expand-arrow[data-tag-color='purple'] { --tag-color: #af52de; }
+.expand-arrow[data-tag-color='gray'] { --tag-color: #8e8e93; }
+
+.expand-arrow[data-tag-color] {
+  color: var(--tag-color);
+}
+
+/* 深色外观下与 Finder 实际渲染的标签色一致（截图像素采样得到） */
+@media (prefers-color-scheme: dark) {
+  .expand-arrow[data-tag-color='red'] { --tag-color: #ff4246; }
+  .expand-arrow[data-tag-color='orange'] { --tag-color: #ff9330; }
+  .expand-arrow[data-tag-color='yellow'] { --tag-color: #ffd503; }
+  .expand-arrow[data-tag-color='green'] { --tag-color: #31d158; }
+  .expand-arrow[data-tag-color='blue'] { --tag-color: #0391ff; }
+  .expand-arrow[data-tag-color='purple'] { --tag-color: #db35f2; }
+  .expand-arrow[data-tag-color='gray'] { --tag-color: #acacb0; }
+}
+
+/* 箭头占位符 */
+.expand-arrow-placeholder {
+  flex-shrink: 0;
+  width: var(--directory-tree-icon-size-md);
+  height: var(--directory-tree-icon-size-md);
+  margin-right: 0;
+}
+
+/* 展开图标（大纲用） */
+.expand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--directory-tree-icon-size-lg);
+  height: var(--directory-tree-icon-size-lg);
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+  transition: transform var(--directory-tree-transition-normal);
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.expand-icon svg {
+  width: var(--directory-tree-icon-size-lg);
+  height: var(--directory-tree-icon-size-lg);
+}
+
+/* 文件图标 */
+.file-icon {
+  flex-shrink: 0;
+  width: var(--directory-tree-icon-size-lg);
+  height: var(--directory-tree-icon-size-lg);
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar)) !important;
+  user-select: none;
+}
+
+/* 文件名 */
+.file-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-family-base);
+  font-size: var(--directory-tree-font-size-item);
+  font-weight: var(--directory-tree-font-weight-normal);
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+}
+
+.file-name.rename-input input {
+  all: unset;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  caret-color: var(--foreground);
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+.file-name.rename-input {
+  border: 1px solid var(--sidebar-accent);
+  border-radius: var(--radius-sm);
+  padding: 0 2px;
+  font-size: 12px;
+}
+
+/* 关闭文件按钮 */
+.tree-item-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: color-mix(in oklch, var(--muted-foreground) 60%, var(--sidebar));
+  cursor: pointer;
+  opacity: 0;
+  /* 鼠标离开后延迟 1s 再淡出；颜色跟随全局主题过渡 */
+  transition: opacity 0.12s ease 0.3s, color var(--theme-transition-duration) var(--theme-transition-timing);
+  z-index: 1;
+}
+
+.tree-item:hover .tree-item-close-btn,
+.tree-item-close-btn:focus-visible {
+  opacity: 1;
+  /* 悬停进入时无延迟，立即显示 */
+  transition: opacity 0.12s ease, color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.tree-item-close-btn:hover {
+  color: var(--foreground);
+}
+
+/* 文件扩展名标签 */
+.file-ext-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+  height: 14px;
+  font-size: 10px;
+  font-weight: var(--directory-tree-font-weight-medium);
+  color: color-mix(in oklch, var(--muted-foreground) 80%, var(--sidebar));
+  background-color: color-mix(in oklch, var(--muted-foreground) 15%, var(--sidebar));
+  border-radius: var(--radius-md);
+  text-transform: lowercase;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   子节点容器（JS height 动画）
+   ============================================ */
+
+/**
+ * 使用 useHeightAnimation Hook + CSS transition 驱动 height 过渡，
+ * 确保同级节点文档流位移与容器高度变化完全同步。
+ */
+
+.tree-children {
+  position: relative;
+}
+
+.tree-children.collapsed {
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* VSCode 风格的层级引导线 */
+.tree-indent,
+.outline-tree-indent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--border);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ============================================
+   大纲面板
+   ============================================ */
+
+/* 大纲滚动容器：.outline-panel 负责滚动，渐隐层挂在这个不滚动的父级上 */
+.outline-scroll {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.outline-panel {
+  padding: var(--space-1) var(--directory-tree-content-padding-x) var(--space-4);
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-gutter: stable;
+}
+
+/* 大纲项 */
+.outline-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+
+  /* 盒模型 */
+  padding: var(--directory-tree-item-padding-y) var(--directory-tree-item-padding-x);
+  margin: 0;
+  border-radius: var(--radius-lg);
+
+  /* 视觉样式 */
+  color: var(--muted-foreground);
+
+  /* 排版 */
+  font-size: var(--directory-tree-font-size-item);
+
+  /* 交互 */
+  cursor: pointer;
+  /* 继承全局颜色过渡 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              border-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.outline-item:hover {
+  background-color: var(--directory-tree-hover-bg);
+}
+
+/* 大纲文本 */
+.outline-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--directory-tree-font-weight-normal);
+}
+
+/* 空状态 */
+.outline-empty {
+  padding: var(--space-5) var(--directory-tree-item-padding-x);
+  text-align: center;
+  font-size: var(--directory-tree-font-size-header);
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+}
+
+/* ============================================
+   大纲树节点
+   ============================================ */
+
+.outline-tree-node {
+  margin: 0;
+  user-select: none;
+}
+
+.outline-tree-item {
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 2px;
+
+  /* 盒模型 */
+  padding: var(--directory-tree-item-padding-y) var(--directory-tree-item-padding-x);
+  margin: 0;
+  border-radius: var(--radius-lg);
+
+  /* 视觉样式 */
+  color: var(--muted-foreground);
+
+  /* 排版 */
+  font-size: var(--directory-tree-font-size-item);
+
+  /* 交互 */
+  cursor: pointer;
+  /* 继承全局颜色过渡 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              border-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.outline-tree-item:hover {
+  background-color: var(--directory-tree-hover-bg);
+}
+
+/* 大纲子节点容器 */
+.outline-children {
+  position: relative;
+  overflow: hidden;
+}
+
+.outline-children.collapsed {
+  opacity: 0;
+}
+
+/* ============================================
+   右键菜单
+   ============================================ */
+
+/* 遮罩层 */
+.context-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+/* 菜单容器 */
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 140px;
+  padding: var(--space-1) 0;
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 菜单项 */
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-1);
+  font-size: var(--directory-tree-font-size-header);
+  color: var(--foreground);
+  cursor: pointer;
+  /* 继承全局颜色过渡 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              border-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.context-menu-item:hover {
+  background-color: var(--directory-tree-hover-bg);
+}
+
+.context-menu-item svg {
+  width: var(--directory-tree-icon-size-lg);
+  height: var(--directory-tree-icon-size-lg);
+  color: var(--muted-foreground);
+}
+
+/* 分隔线 */
+.context-menu-divider {
+  height: 1px;
+  margin: var(--space-1) 0;
+  background-color: var(--border);
+}
+
+/* 删除项 */
+.context-menu-item.delete {
+  color: var(--muted-foreground);
+}
+
+.context-menu-item.delete svg {
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--popover));
+}
+
+/* ============================================
+   拖拽样式
+   ============================================ */
+
+.tree-item.dragging {
+  opacity: 0.5;
+}
+
+.tree-item.drag-over {
+  background-color: var(--muted);
+  border: 1px dashed var(--primary);
+}
+
+/* ============================================
+   文件搜索
+   ============================================ */
+
+.file-tree-search-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: var(--space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 21px;
+  height: 21px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  /* opacity 保持悬停显示速度，颜色跟随全局主题过渡 */
+  transition: opacity 0.15s ease,
+              background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.sidebar-area:hover .file-tree-search-toggle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .file-tree-search-toggle {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.mobile-layout .file-tree-search-toggle {
+  width: 24px;
+  height: 24px;
+}
+
+.file-tree-search-toggle:hover,
+.file-tree-search-close-icon:hover {
+  color: var(--foreground);
+  background: var(--directory-tree-hover-bg);
+}
+
+.file-tree-search-close-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0;
+  /* 颜色跟随全局主题过渡，避免与背景 0.25s 不同步 */
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing),
+              color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+.file-tree-search {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 12px;
+  /* 遮住底下的 tab，颜色跟随全局主题过渡，与 .sidebar-area 同步 */
+  background-color: var(--sidebar);
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing);
+  transform-origin: right center;
+  animation: file-tree-search-expand 0.2s ease-out;
+}
+
+@keyframes file-tree-search-expand {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.file-tree-search.closing {
+  animation: file-tree-search-collapse 0.18s ease-in forwards;
+}
+
+@keyframes file-tree-search-collapse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.file-tree-search-box {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 var(--space-1);
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+
+.file-tree-search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--foreground);
+  font-size: var(--directory-tree-font-size-item);
+}
+
+.file-tree-search-input::placeholder {
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+}
+
+.file-tree-search-spinner {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+
+.tree-panel-stack {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-results-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  /* 遮住底下的文件树，颜色跟随全局主题过渡，与 .sidebar-area 同步 */
+  background-color: var(--sidebar);
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-timing);
+}
+
+/* 搜索结果滚动容器：.search-results 负责滚动，渐隐层挂在这个不滚动的父级上 */
+.search-results-scroll {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding: 0 var(--directory-tree-content-padding-x) var(--space-4);
+}
+
+.search-results-empty,
+.search-results-limit {
+  padding: var(--space-3) var(--directory-tree-item-padding-x);
+  text-align: center;
+  font-size: var(--directory-tree-font-size-small);
+  color: var(--muted-foreground);
+}
+
+.search-result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: var(--directory-tree-item-padding-y) var(--directory-tree-item-padding-x);
+  margin: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-family-base);
+}
+
+.search-result-item:hover {
+  background-color: var(--directory-tree-hover-bg);
+}
+
+.search-result-item.selected {
+  background-color: var(--directory-tree-selected-bg);
+}
+
+.search-result-item.selected .search-result-name {
+  color: var(--foreground) !important;
+}
+
+.search-result-name {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--directory-tree-font-size-item);
+  color: var(--foreground);
+}
+
+.search-result-name mark {
+  background: transparent;
+  color: var(--primary);
+  font-weight: var(--directory-tree-font-weight-medium);
+}
+
+.search-result-path {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--directory-tree-font-size-small);
+  color: color-mix(in oklch, var(--muted-foreground) 70%, var(--sidebar));
+}

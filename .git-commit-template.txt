@@ -1,0 +1,10 @@
+# <type>(<scope>): <description>
+#
+# Type (required): feat | fix | chore | docs | refactor | style | perf | test
+# Scope (optional): e.g., editor, i18n, theme, git
+# Description: brief imperative sentence (Chinese or English)
+#
+# Examples:
+#   feat(editor): support markdown shortcut
+#   fix: correct typo in login page
+#   chore: update dependencies

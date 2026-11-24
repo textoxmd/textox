@@ -1,0 +1,13 @@
+{
+  "name": "@texto/plugin-hello-world",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@textox/plugin-sdk": "file:../../vendor/plugin-sdk",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@textox/plugin-build": "^0.1.1"
+  }
+}

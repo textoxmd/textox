@@ -1,0 +1,16 @@
+{
+  "name": "@texto/markdown-editor-api",
+  "version": "0.0.1",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@texto/plugin-sdk": "workspace:*"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window and additional windows",
+  "windows": [
+    "main",
+    "window-*",
+    "settings",
+    "acknowledgments",
+    "privacy",
+    "onboarding"
+  ],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "fs:default",
+    "fs:allow-write-file",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "*"
+        }
+      ]
+    },
+    "dialog:default",
+    "core:window:default",
+    "core:window:allow-set-title",
+    "core:window:allow-start-dragging",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-set-fullscreen",
+    "core:window:allow-center",
+    "core:window:allow-show",
+    "log:default",
+    "core:event:default",
+    "core:webview:allow-print",
+    "store:default"
+  ]
+}
