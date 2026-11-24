@@ -33,7 +33,7 @@ tauri-plugin-store = "2"
 tauri-plugin-single-instance = "2"
 log = "0.4"
 chrono = "0.4"
-rand = "0.8"
+rand = "0.9"
 # wry 0.55+ 在 macOS 上通过 transparent feature 关闭 WKWebView 默认白色背景
 # （drawsBackground=false + underPageBackgroundColor），配合 background_color 防止暗色模式白闪。
 # 该 feature 与 tauri-runtime-wry 的依赖合并到同一个 wry，不影响窗口透明行为。
