@@ -1,8 +1,8 @@
 # Textox
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](LICENSE)
-[![CI](https://github.com/chenhualinx/Textox/actions/workflows/ci.yml/badge.svg)](https://github.com/chenhualinx/Textox/actions/workflows/ci.yml)
-[![Build](https://github.com/chenhualinx/Textox/actions/workflows/build.yml/badge.svg)](https://github.com/chenhualinx/Textox/actions/workflows/build.yml)
+[![CI](https://github.com/textoxmd/textox/actions/workflows/ci.yml/badge.svg)](https://github.com/textoxmd/textox/actions/workflows/ci.yml)
+[![Build](https://github.com/textoxmd/textox/actions/workflows/build.yml/badge.svg)](https://github.com/textoxmd/textox/actions/workflows/build.yml)
 
 **简体中文** | [English](README.en.md)
 
@@ -46,7 +46,7 @@ Textox 是一个本地优先的 Markdown 编辑器：极简设计、开箱即用
 仓库依赖 4 个 git submodule，克隆时必须一并检出：
 
 ```sh
-git clone --recurse-submodules https://github.com/chenhualinx/Textox.git
+git clone --recurse-submodules https://github.com/textoxmd/textox.git
 cd Textox
 
 # 已克隆但缺少子模块时
@@ -176,6 +176,7 @@ test-fixtures/plugins/    第一方插件测试夹具（不进生产包）
 vendor/                   git submodule（excalidraw / translations / plugin-sdk / mkdext）
 scripts/build/            统一构建入口（dev / build / package）
 docs/                     插件开发、运行时与图标规范
+openspec/                 变更提案与规格
 ```
 
 ## 插件开发

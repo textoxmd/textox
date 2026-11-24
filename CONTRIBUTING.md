@@ -23,7 +23,7 @@ Linux 还需要 Tauri 的系统依赖（`libwebkit2gtk-4.1-dev`、`libgtk-3-dev`
 `vendor/plugin-sdk`、`vendor/plugins/mkdext`），必须一并检出：
 
 ```sh
-git clone --recurse-submodules https://github.com/chenhualinx/Textox.git
+git clone --recurse-submodules https://github.com/textoxmd/textox.git
 cd Textox
 # 已经 clone 过但没有子模块：
 git submodule update --init --recursive

@@ -1,8 +1,8 @@
 # Textox
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](LICENSE)
-[![CI](https://github.com/chenhualinx/Textox/actions/workflows/ci.yml/badge.svg)](https://github.com/chenhualinx/Textox/actions/workflows/ci.yml)
-[![Build](https://github.com/chenhualinx/Textox/actions/workflows/build.yml/badge.svg)](https://github.com/chenhualinx/Textox/actions/workflows/build.yml)
+[![CI](https://github.com/textoxmd/textox/actions/workflows/ci.yml/badge.svg)](https://github.com/textoxmd/textox/actions/workflows/ci.yml)
+[![Build](https://github.com/textoxmd/textox/actions/workflows/build.yml/badge.svg)](https://github.com/textoxmd/textox/actions/workflows/build.yml)
 
 [简体中文](README.md) | **English**
 
@@ -47,7 +47,7 @@ built around an IDE-like workspace. It is written with Tauri v2, React and Prose
 The repository uses 4 git submodules; clone them together with the repo:
 
 ```sh
-git clone --recurse-submodules https://github.com/chenhualinx/Textox.git
+git clone --recurse-submodules https://github.com/textoxmd/textox.git
 cd Textox
 
 # if you cloned without submodules
@@ -180,6 +180,7 @@ test-fixtures/plugins/    first-party plugin fixtures (not shipped)
 vendor/                   git submodules (excalidraw / translations / plugin-sdk / mkdext)
 scripts/build/            unified dev / build / package entry points
 docs/                     plugin development, runtime and icon specs
+openspec/                 change proposals and specs
 ```
 
 ## Plugin development

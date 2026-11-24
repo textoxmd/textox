@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用问题与讨论
+    url: https://github.com/textoxmd/textox/discussions
+    about: 安装、配置、插件使用等非缺陷问题请走 Discussions
+  - name: 安全漏洞
+    url: https://github.com/textoxmd/textox/blob/main/SECURITY.md
+    about: 请勿公开提交安全问题，按 SECURITY.md 私下联系

@@ -1,0 +1,78 @@
+name: Bug 报告
+description: 报告可复现的缺陷或异常行为
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！提交前请先搜索已有 issue，并确认使用的是最新版本。
+        安全漏洞请勿在此提交，见 [SECURITY.md](https://github.com/textoxmd/textox/blob/main/SECURITY.md)。
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 简明描述发生了什么。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开…
+        2. 点击…
+        3. 看到…
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Textox 版本
+      description: 设置 → 关于，或下载页上的版本号。
+      placeholder: "2.4.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - iOS / iPadOS
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 编辑器模式
+      options:
+        - IR（所见即所得）
+        - SV（源码视图）
+        - 两者都有
+        - 与模式无关
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息
+      description: 截图/录屏、错误日志、启用的第三方插件、是否开启 MCP 等。
+    validations:
+      required: false

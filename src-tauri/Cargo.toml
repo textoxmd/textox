@@ -4,7 +4,7 @@ version = "2.4.2"
 description = "Best Markdown Editor"
 authors = ["Textox contributors"]
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/chenhualinx/Textox"
+repository = "https://github.com/textoxmd/textox"
 edition = "2021"
 # `src/bin/plugin-cli.rs` makes this package have two binaries; Tauri's dev
 # command runs `cargo run` without `--bin`, so pin the app binary.
