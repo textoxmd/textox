@@ -243,7 +243,7 @@ bun run typecheck                              # 全仓类型检查
 bun run test:plugins                           # 插件/骨架契约单测
 bun run check:skeleton                         # 骨架不得出现插件专属字面量
 bun run check:editor-boundary                  # 编辑器不得 import 骨架
-bun run check:version                          # 三处版本号一致
+bun run check:version                          # 三处版本号一致 + Tauri 插件版本对齐
 
 # 编辑器行为测试（spec 驱动）
 bunx vitest run --config src/components/TextoEditor/vitest.config.ts

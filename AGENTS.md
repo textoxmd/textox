@@ -25,7 +25,7 @@ bun run app:dev                # full Tauri desktop dev (make dev)
 | `bun run test:plugins` | 插件/骨架契约单测（`vitest.config.ts`） |
 | `bun run check:skeleton` | 硬规则：`src/` 生产代码不得出现插件专属字面量 |
 | `bun run check:editor-boundary` | 硬规则：编辑器不得 import 骨架 |
-| `bun run check:version` | 校验 `tauri.conf.json` / `Cargo.toml` / `package.json` 版本一致 |
+| `bun run check:version` | 校验 `tauri.conf.json` / `Cargo.toml` / `package.json` 版本一致，并检查 `@tauri-apps/plugin-*` 与 `Cargo.lock` 中对应 crate 的 major.minor 一致（`tauri build` 会强制校验） |
 | `bun run i18n:build` | YAML → JSON (edit YAML in `vendor/translations/sources/*/*.yaml`) |
 | `bun run app:dev` / `app:build` | Tauri 开发 / 构建（`-- --edition lite` 切 Lite；build 只出应用本体） |
 | `bun run app:package` | 打包（默认直接安装：macOS DMG / Windows MSI+NSIS；`-- --store`：macOS PKG / Windows MSIX） |

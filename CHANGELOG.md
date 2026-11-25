@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- ci: `check:version` 增加 Tauri 插件版本校验——`@tauri-apps/plugin-*` 与 `Cargo.lock` 中同名 crate 的 major.minor 必须一致，避免 Dependabot 只升 JS 侧导致 `tauri build` 直接失败
+- chore(依赖): rust minor/patch（22 个 crate）、js minor/patch（48 个包，含 `lucide-react` 1.77、`mermaid` 12）、`i18next` 25 → 27；适配 lucide 图标节点结构（`__iconData.node`）与 i18next 27 的 `t()` 签名
 - fix(安全): 插件包解压依赖 `zip` 2.6.1 → 9.8.2，修复 Zip Cloaking（任意文件覆盖 / RCE）等 3 个公告；`by_index` 条目名改为可失败读取
 - chore(依赖): `bun.lock` 不再固定国内镜像，1118 个 tarball 地址改回 `registry.npmjs.org`；CI 增加守卫，镜像用户用 `bun install --registry` 且不提交 lockfile
 - docs(README): README 默认英文，中文版独立为 `README.zh-CN.md`；补充官网与 App Store / Microsoft Store 下载入口

@@ -246,7 +246,7 @@ bun run typecheck                              # whole-repo typecheck
 bun run test:plugins                           # plugin/runtime contract tests
 bun run check:skeleton                         # no plugin-specific literals in the skeleton
 bun run check:editor-boundary                  # editor must not import app code
-bun run check:version                          # version consistency
+bun run check:version                          # app version + Tauri plugin versions
 
 bunx vitest run --config src/components/TextoEditor/vitest.config.ts
 
