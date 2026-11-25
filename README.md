@@ -186,6 +186,42 @@ The Team ID is injected into entitlements at build time (the repo only has a `YO
 placeholder), so there is nothing to edit by hand.
 Windows code signing is not wired up yet, so MSI/NSIS trigger SmartScreen.
 
+#### Preparing the Apple secrets
+
+1. **Developer ID certificate** — in Keychain Access → Certificate Assistant →
+   *Request a Certificate from a Certificate Authority*, upload the CSR at
+   [developer.apple.com](https://developer.apple.com/account/resources/certificates) →
+   *Developer ID Application*, download and install it, then export it **with its private key**
+   as `.p12`.
+2. **App Store Connect API key** — App Store Connect → *Users and Access* → *Integrations* →
+   *Team Keys* → create a key with the **Developer ID** role, download `AuthKey_XXXX.p8`
+   (only once). Note the Key ID and the Issuer ID shown above the list.
+3. Fill the secrets (works from a terminal; `gh` must be authenticated as a repo admin):
+
+```sh
+REPO=textoxmd/textox
+
+# certificate, base64 (newlines are stripped by the workflow anyway)
+base64 -i DeveloperID.p12 | gh secret set APPLE_CERTIFICATE_P12 -R "$REPO"
+gh secret set APPLE_CERTIFICATE_PASSWORD -R "$REPO" --body 'your-p12-password'
+gh secret set TEXTO_APP_SIGNING_IDENTITY -R "$REPO" \
+  --body 'Developer ID Application: Your Name (TEAMID)'
+gh secret set TEXTO_APPLE_TEAM_ID -R "$REPO" --body 'TEAMID'
+
+# notarization, App Store Connect API key
+base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set TEXTO_NOTARY_API_KEY -R "$REPO"
+gh secret set TEXTO_NOTARY_API_KEY_ID -R "$REPO" --body 'XXXXXXXXXX'
+gh secret set TEXTO_NOTARY_API_ISSUER -R "$REPO" --body 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+```
+
+Then run *Actions → Build → Run workflow* (`store = false`) to produce a signed DMG without
+publishing anything, and check it locally:
+
+```sh
+spctl -a -vvv -t open --context context:primary-signature Textox-*.dmg
+xcrun stapler validate Textox-*.dmg
+```
+
 Caveats:
 
 - macOS runners bill at 10× minutes; on a private repo watch your quota (or build only `full`).

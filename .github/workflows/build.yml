@@ -117,7 +117,7 @@ jobs:
         run: |
           set -euo pipefail
           KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
-          echo "$APPLE_CERTIFICATE_P12" | openssl base64 -d -A -out "$RUNNER_TEMP/cert.p12"
+          printf '%s' "$APPLE_CERTIFICATE_P12" | tr -d '\n\r\t ' | openssl base64 -d -A -out "$RUNNER_TEMP/cert.p12"
           security create-keychain -p actions "$KEYCHAIN"
           security set-keychain-settings -lut 21600 "$KEYCHAIN"
           security unlock-keychain -p actions "$KEYCHAIN"
@@ -132,10 +132,10 @@ jobs:
         run: |
           set -euo pipefail
           if [ -n "$APPLE_PROVISION_PROFILE" ]; then
-            echo "$APPLE_PROVISION_PROFILE" | openssl base64 -d -A -out src-tauri/embedded.provisionprofile
+            printf '%s' "$APPLE_PROVISION_PROFILE" | tr -d '\n\r\t ' | openssl base64 -d -A -out src-tauri/embedded.provisionprofile
           fi
           if [ -n "$APPLE_PROVISION_PROFILE_LITE" ]; then
-            echo "$APPLE_PROVISION_PROFILE_LITE" | openssl base64 -d -A -out src-tauri/embedded.provisionprofile.lite
+            printf '%s' "$APPLE_PROVISION_PROFILE_LITE" | tr -d '\n\r\t ' | openssl base64 -d -A -out src-tauri/embedded.provisionprofile.lite
           fi
           ls -l src-tauri/embedded.provisionprofile* || true
 
@@ -145,7 +145,7 @@ jobs:
         if: env.TEXTO_NOTARY_API_KEY != ''
         run: |
           set -euo pipefail
-          printf '%s' "$TEXTO_NOTARY_API_KEY" | openssl base64 -d -A -out "$RUNNER_TEMP/AuthKey.p8"
+          printf '%s' "$TEXTO_NOTARY_API_KEY" | tr -d '\n\r\t ' | openssl base64 -d -A -out "$RUNNER_TEMP/AuthKey.p8"
           echo "TEXTO_NOTARY_API_KEY=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
 
       - name: Package

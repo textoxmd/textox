@@ -188,6 +188,39 @@ SENTRY_DSN="https://<key>@<host>/<project>" bun run app:build
 Apple Distribution 证书，且不需要公证。entitlements 里的团队 ID 在构建时注入，仓库中只有
 `YOUR_TEAM_ID` 占位，无需手改。Windows 目前没有接入代码签名，MSI/NSIS 会被 SmartScreen 提示。
 
+#### 怎么准备这些 secret
+
+1. **Developer ID 证书**：钥匙串访问 → 证书助理 → *从证书颁发机构请求证书*，拿到 CSR 后在
+   [developer.apple.com](https://developer.apple.com/account/resources/certificates) 申请
+   *Developer ID Application*，下载安装后**连私钥一起**导出为 `.p12`。
+2. **App Store Connect API Key**：App Store Connect → *用户和访问* → *集成* → *团队密钥*，
+   新建一把角色为 **Developer ID** 的密钥，下载 `AuthKey_XXXX.p8`（只能下一次），记下 Key ID
+   与列表顶部的 Issuer ID。
+3. 写入 secret（本机已 `gh auth login` 且有仓库管理员权限即可）：
+
+```sh
+REPO=textoxmd/textox
+
+# 证书（base64；工作流会自己剥掉换行）
+base64 -i DeveloperID.p12 | gh secret set APPLE_CERTIFICATE_P12 -R "$REPO"
+gh secret set APPLE_CERTIFICATE_PASSWORD -R "$REPO" --body 'p12 密码'
+gh secret set TEXTO_APP_SIGNING_IDENTITY -R "$REPO" \
+  --body 'Developer ID Application: Your Name (TEAMID)'
+gh secret set TEXTO_APPLE_TEAM_ID -R "$REPO" --body 'TEAMID'
+
+# 公证：App Store Connect API Key
+base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set TEXTO_NOTARY_API_KEY -R "$REPO"
+gh secret set TEXTO_NOTARY_API_KEY_ID -R "$REPO" --body 'XXXXXXXXXX'
+gh secret set TEXTO_NOTARY_API_ISSUER -R "$REPO" --body 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+```
+
+先跑一次 *Actions → Build → Run workflow*（`store = false`）验证，不产生 release。产物下来后本地检查：
+
+```sh
+spctl -a -vvv -t open --context context:primary-signature Textox-*.dmg
+xcrun stapler validate Textox-*.dmg
+```
+
 注意事项：
 
 - macOS runner 按 10 倍时长计费，私有仓库请留意额度；可在 fork 里只跑 `full`。
