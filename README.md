@@ -235,7 +235,8 @@ The plugin contract lives in [`vendor/plugin-sdk`](vendor/plugin-sdk); the build
 ## Contributing
 
 Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) first. Develop against `develop`; `main` is for
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) (also available in
+[简体中文](CODE_OF_CONDUCT.zh-CN.md)) first. Develop against `develop`; `main` is for
 releases.
 
 ## Security

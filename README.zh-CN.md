@@ -236,7 +236,7 @@ openspec/                 变更提案与规格
 ## 贡献
 
 欢迎提交 issue 与 PR，请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 与
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。分支策略：功能开发基于 `develop`，`main` 用于发布。
+[行为准则](CODE_OF_CONDUCT.zh-CN.md)（[English](CODE_OF_CONDUCT.md)）。分支策略：功能开发基于 `develop`，`main` 用于发布。
 
 ## 安全
 

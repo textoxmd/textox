@@ -2,7 +2,7 @@
 
 感谢你愿意参与 Textox！本文档说明如何搭建开发环境、运行测试以及提交改动。
 
-参与本项目即表示你同意遵守 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
+参与本项目即表示你同意遵守[行为准则](CODE_OF_CONDUCT.zh-CN.md)（[English](CODE_OF_CONDUCT.md)）。
 
 ## 环境要求
 
