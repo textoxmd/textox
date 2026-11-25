@@ -193,9 +193,14 @@ Windows code signing is not wired up yet, so MSI/NSIS trigger SmartScreen.
    [developer.apple.com](https://developer.apple.com/account/resources/certificates) →
    *Developer ID Application*, download and install it, then export it **with its private key**
    as `.p12`.
-2. **App Store Connect API key** — App Store Connect → *Users and Access* → *Integrations* →
-   *Team Keys* → create a key with the **Developer ID** role, download `AuthKey_XXXX.p8`
-   (only once). Note the Key ID and the Issuer ID shown above the list.
+2. **Notarization credentials** — either of these works, pick one:
+   - **Apple ID + app-specific password** (simplest, and the only option for individual accounts
+     that have no *Team Keys*): sign in at [appleid.apple.com](https://appleid.apple.com) →
+     *Sign-In and Security* → *App-Specific Passwords* → create one (e.g. `notarytool`).
+     `notarytool` accepts it from CI without any 2FA prompt.
+   - **App Store Connect API key** (only the Account Holder/Admin sees *Users and Access* →
+     *Integrations* → *Team Keys*): create a key with the **Developer ID** role, download
+     `AuthKey_XXXX.p8` (only once), and note the Key ID and Issuer ID shown above the list.
 3. Fill the secrets (works from a terminal; `gh` must be authenticated as a repo admin):
 
 ```sh
@@ -208,10 +213,14 @@ gh secret set TEXTO_APP_SIGNING_IDENTITY -R "$REPO" \
   --body 'Developer ID Application: Your Name (TEAMID)'
 gh secret set TEXTO_APPLE_TEAM_ID -R "$REPO" --body 'TEAMID'
 
-# notarization, App Store Connect API key
-base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set TEXTO_NOTARY_API_KEY -R "$REPO"
-gh secret set TEXTO_NOTARY_API_KEY_ID -R "$REPO" --body 'XXXXXXXXXX'
-gh secret set TEXTO_NOTARY_API_ISSUER -R "$REPO" --body 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+# notarization, option A: Apple ID + app-specific password (recommended)
+gh secret set TEXTO_NOTARY_APPLE_ID -R "$REPO" --body 'you@example.com'
+gh secret set TEXTO_NOTARY_PASSWORD -R "$REPO" --body 'abcd-efgh-ijkl-mnop'
+
+# notarization, option B: App Store Connect API key
+# base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set TEXTO_NOTARY_API_KEY -R "$REPO"
+# gh secret set TEXTO_NOTARY_API_KEY_ID -R "$REPO" --body 'XXXXXXXXXX'
+# gh secret set TEXTO_NOTARY_API_ISSUER -R "$REPO" --body 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 ```
 
 Then run *Actions → Build → Run workflow* (`store = false`) to produce a signed DMG without
@@ -228,7 +237,7 @@ Caveats:
 - Unsigned DMGs are blocked by Gatekeeper elsewhere: right-click open, or
   `xattr -dr com.apple.quarantine Textox.app`.
 - Without credentials the artifacts are unsigned/unnotarized; configure cert + notary secrets for real releases (tag builds verify it).
-- Parts of `bun.lock` pin Chinese mirrors — installs work on CI but can be slower.
+- `bun.lock` only records `registry.npmjs.org`; if you install through a mirror, restore the lockfile before committing.
 
 ## Tests and checks
 

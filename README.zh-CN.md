@@ -193,9 +193,13 @@ Apple Distribution 证书，且不需要公证。entitlements 里的团队 ID �
 1. **Developer ID 证书**：钥匙串访问 → 证书助理 → *从证书颁发机构请求证书*，拿到 CSR 后在
    [developer.apple.com](https://developer.apple.com/account/resources/certificates) 申请
    *Developer ID Application*，下载安装后**连私钥一起**导出为 `.p12`。
-2. **App Store Connect API Key**：App Store Connect → *用户和访问* → *集成* → *团队密钥*，
-   新建一把角色为 **Developer ID** 的密钥，下载 `AuthKey_XXXX.p8`（只能下一次），记下 Key ID
-   与列表顶部的 Issuer ID。
+2. **公证凭据**：以下两种任选其一。
+   - **Apple ID + App 专用密码**（最简单；个人开发者账号没有 *团队密钥* 入口时用这个）：
+     登录 [appleid.apple.com](https://appleid.apple.com) → *登录与安全* → *App 专用密码* →
+     新建一个（名字随意，如 `notarytool`）。`notarytool` 在 CI 里用它不需要二次验证。
+   - **App Store Connect API Key**（只有账号持有人 / 管理员能看到 *用户和访问 → 集成 →
+     团队密钥*）：新建一把角色为 **Developer ID** 的密钥，下载 `AuthKey_XXXX.p8`（只能下一次），
+     记下 Key ID 与列表顶部的 Issuer ID。
 3. 写入 secret（本机已 `gh auth login` 且有仓库管理员权限即可）：
 
 ```sh
@@ -208,10 +212,14 @@ gh secret set TEXTO_APP_SIGNING_IDENTITY -R "$REPO" \
   --body 'Developer ID Application: Your Name (TEAMID)'
 gh secret set TEXTO_APPLE_TEAM_ID -R "$REPO" --body 'TEAMID'
 
-# 公证：App Store Connect API Key
-base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set TEXTO_NOTARY_API_KEY -R "$REPO"
-gh secret set TEXTO_NOTARY_API_KEY_ID -R "$REPO" --body 'XXXXXXXXXX'
-gh secret set TEXTO_NOTARY_API_ISSUER -R "$REPO" --body 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+# 公证，方案 A：Apple ID + App 专用密码（推荐）
+gh secret set TEXTO_NOTARY_APPLE_ID -R "$REPO" --body 'you@example.com'
+gh secret set TEXTO_NOTARY_PASSWORD -R "$REPO" --body 'abcd-efgh-ijkl-mnop'
+
+# 公证，方案 B：App Store Connect API Key
+# base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set TEXTO_NOTARY_API_KEY -R "$REPO"
+# gh secret set TEXTO_NOTARY_API_KEY_ID -R "$REPO" --body 'XXXXXXXXXX'
+# gh secret set TEXTO_NOTARY_API_ISSUER -R "$REPO" --body 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 ```
 
 先跑一次 *Actions → Build → Run workflow*（`store = false`）验证，不产生 release。产物下来后本地检查：
@@ -226,7 +234,7 @@ xcrun stapler validate Textox-*.dmg
 - macOS runner 按 10 倍时长计费，私有仓库请留意额度；可在 fork 里只跑 `full`。
 - 未签名 DMG 在别的机器上会被 Gatekeeper 拦，右键打开或 `xattr -dr com.apple.quarantine Textox.app`。
 - 公证未配置时会降级为未签名/未公证产物；正式发布请配齐证书与公证凭据（tag 构建会强制校验）。
-- `bun.lock` 中部分包记录的是国内镜像地址，CI 上可正常安装但可能偏慢。
+- `bun.lock` 只记录 `registry.npmjs.org`；本地用镜像安装后请还原 lockfile 再提交。
 
 ## 测试与检查
 
